@@ -3,10 +3,14 @@ import { Layout } from "./component/layout/layout"
 import { Home } from "./component/home/home"
 import { Signup } from "./component/signup/signup"
 import { SignIn } from "./component/signin/signin"
+import InterceptorProvider from "./providers/Interceptor/InterceptorProvider"
+import { AuthProvider } from "./providers/Auth/AuthProvider"
  export const App=()=>{
   return (
     <>
      <BrowserRouter>
+     <InterceptorProvider>
+      <AuthProvider>
      <Layout>
       <Routes>
         <Route path="/" element={<Home></Home>}></Route>
@@ -14,6 +18,8 @@ import { SignIn } from "./component/signin/signin"
         <Route path="/signin" element={<SignIn/>}></Route>
       </Routes>
       </Layout>
+      </AuthProvider>
+      </InterceptorProvider>
     </BrowserRouter>
     </>
   )
