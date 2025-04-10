@@ -26,7 +26,7 @@ export const Header=()=>{
             <Link to="/" className="block text-white hover:text-gray-300">Home</Link>
           </li>
           <li>
-            <a href="#" className="block text-white hover:text-gray-300">About</a>
+            <Link to="/about" className="block text-white hover:text-gray-300">About</Link>
           </li>
           <li>
             <a href="#" className="block text-white hover:text-gray-300">Services</a>
@@ -50,7 +50,7 @@ export const Header=()=>{
 </div>
    <ul className="flex [&>*]:flex text-md align-center max-lg:hidden">
     <li className="items-center p-6"><Link to="/" className="hover:text-blue-600">Home</Link></li>
-    <li className="items-center p-6"><Link to="/signup" className="hover:text-blue-600">About</Link></li>
+    <li className="items-center p-6"><Link to="/about" className="hover:text-blue-600">About</Link></li>
     <li className="items-center p-6"><a href="#" className="hover:text-blue-600">Blog</a></li>
     <li className="items-center p-6"><a href="#" className="hover:text-blue-600">Support</a></li>
    </ul>

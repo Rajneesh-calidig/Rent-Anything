@@ -5,6 +5,10 @@ import { Signup } from "./component/signup/signup"
 import { SignIn } from "./component/signin/signin"
 import InterceptorProvider from "./providers/Interceptor/InterceptorProvider"
 import { AuthProvider } from "./providers/Auth/AuthProvider"
+import { Contact } from "./component/contactUs/contactUs"
+import { About } from "./component/aboutUs/aboutUs"
+import RentItemsPage from "./component/items/items"
+import RentItemCard from "./component/rental/rental"
  export const App=()=>{
   return (
     <>
@@ -13,9 +17,13 @@ import { AuthProvider } from "./providers/Auth/AuthProvider"
       <AuthProvider>
      <Layout>
       <Routes>
-        <Route path="/" element={<Home></Home>}></Route>
-        <Route path="/signup" element={<Signup/>}></Route>
-        <Route path="/signin" element={<SignIn/>}></Route>
+        {/* <Route exact path="/" element={<Home></Home>}></Route> */}
+        <Route exact path="/" element={<RentItemsPage/>}></Route>
+        <Route exact path="/signup" element={<Signup/>}></Route>
+        <Route exact path="/signin" element={<SignIn/>}></Route>
+        <Route exact path="/contact-us" element={<Contact/>}></Route>
+        <Route exact path="/about" element={<About/>}></Route>
+        <Route exact path="/rent" element={<RentItemCard/>}></Route>
       </Routes>
       </Layout>
       </AuthProvider>
