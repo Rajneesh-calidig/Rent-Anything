@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 export const Footer=()=>{
     return(
         <>
@@ -12,7 +13,7 @@ export const Footer=()=>{
             <h2 class="mb-6 text-sm font-semibold  uppercase">Company</h2>
             <ul class="text-gray-500  font-medium">
                 <li class="mb-4">
-                    <a href="#" class=" hover:underline">About</a>
+                    <Link to="/about" class=" hover:underline">About</Link>
                 </li>
                 <li class="mb-4">
                     <a href="#" class="hover:underline">Careers</a>
@@ -38,7 +39,7 @@ export const Footer=()=>{
                     <a href="#" class="hover:underline">Facebook</a>
                 </li>
                 <li class="mb-4">
-                    <a href="#" class="hover:underline">Contact Us</a>
+                    <Link to="/contact-us" class="hover:underline">Contact Us</Link>
                 </li>
             </ul>
         </div>
