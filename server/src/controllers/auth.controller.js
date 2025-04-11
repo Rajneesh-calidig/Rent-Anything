@@ -72,7 +72,8 @@ export async function getUser(req, res) {
 
 export async function login(req, res) {
   try {
-    const { emailOrNumber, password, rememberMe } = req.body;
+    const { emailOrNumber, password,rememberMe } = req.body;
+    console.log(emailOrNumber,password)
 
     if (!emailOrNumber || !password) {
       return res

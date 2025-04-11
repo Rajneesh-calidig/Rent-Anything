@@ -1,11 +1,13 @@
 import Logo from "../../assets/img/logo.png"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes,faBars,faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { clearSessionData, getSessionData, removeSessionData } from "../../services/session.service"
 
 export const Header=()=>{
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
     return (
         <>
        <div className="w-full ">
@@ -56,12 +58,21 @@ export const Header=()=>{
    </ul>
    </div>
    <div class="flex items-center max-md:hidden">
+    {getSessionData("email") ? (
+      <div>
+      <button className="p-3 bg-blue-600 w-40 text-white text-lg font-semibold rounded ml-4 hover:bg-blue-700 cursor-pointer" onClick={(e) => {e.preventDefault();clearSessionData();navigate('/');}}>Logout</button>
+      </div>
+    ):(
+      <div className="">
+
     <Link to="/signin">
    <button className="text-lg font-normal mr-4 cursor-pointer hover:text-gray-400">Sign In</button>
     </Link>
     <Link to="/signup">
     <button className="p-3 bg-blue-600 w-40 text-white text-lg font-semibold rounded ml-4 hover:bg-blue-700 cursor-pointer">Sign Up</button>
     </Link>
+      </div>
+    )}
    </div>
 </div>
 

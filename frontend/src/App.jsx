@@ -5,6 +5,7 @@ import { Signup } from "./component/signup/signup"
 import { SignIn } from "./component/signin/signin"
 import InterceptorProvider from "./providers/Interceptor/InterceptorProvider"
 import { AuthProvider } from "./providers/Auth/AuthProvider"
+import Dashboard from "./pages/Dashboard.jsx"
  export const App=()=>{
   return (
     <>
@@ -16,6 +17,7 @@ import { AuthProvider } from "./providers/Auth/AuthProvider"
         <Route path="/" element={<Home></Home>}></Route>
         <Route path="/signup" element={<Signup/>}></Route>
         <Route path="/signin" element={<SignIn/>}></Route>
+        <Route path="/dashboard" element={<Dashboard />}></Route>
       </Routes>
       </Layout>
       </AuthProvider>

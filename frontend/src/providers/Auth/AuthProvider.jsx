@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useInterceptor } from "../Interceptor/InterceptorProvider.jsx";
-import { clearSessionData } from "../../services/session.service";
+import { clearSessionData, setSessionData } from "../../services/session.service";
 
 const defaultUser = {};
 
@@ -49,7 +49,11 @@ export const AuthProvider = ({ children }) => {
     async (data) => {
       try {
         const response = await api.post("/auth/login", data);
-        getUser();
+        console.log("email",response.data.user.email)
+        setSessionData("email", response.data.user.email);
+        setSessionData("name", response.data.user.name);
+        // getUser();
+        // setSessionData()
         return response;
       } catch (err) {
         return Promise.reject(err);
