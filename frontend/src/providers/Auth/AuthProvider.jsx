@@ -23,8 +23,10 @@ export const AuthProvider = ({ children }) => {
   const getUser = useCallback(async () => {
     try {
       const response = await api.get("/auth/user");
-      if (response?.data?.admin) {
-        updateUser(response.data.admin);
+      if (response?.data?.user) {
+        updateUser(response.data.user);
+        setSessionData("email", response.data.user.email);
+        setSessionData("name", response.data.user.name);
         return response;
       }
     } catch (err) {
@@ -50,6 +52,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await api.post("/auth/login", data);
         console.log("email",response.data.user.email)
+        setUser(response.data.user)
         setSessionData("email", response.data.user.email);
         setSessionData("name", response.data.user.name);
         // getUser();
@@ -67,6 +70,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post("/auth/logout", {});
       setUser({});
       clearSessionData();
+      console.log(response)
       return response;
     } catch (err) {
       return err.response.data.message;

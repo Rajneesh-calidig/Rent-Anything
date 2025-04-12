@@ -12,8 +12,9 @@ export const protectRoute = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded);
     if(decoded){
-      const user = await User.findById(decoded._id)
+      const user = await User.findById(decoded.userId)
       if(user.status === "INACTIVE"){
         res.clearCookie("jwt-user");
         return res.status(401).json({success:false,message:"Unauthorized user"})

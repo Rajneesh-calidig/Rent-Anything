@@ -1,5 +1,5 @@
 import React from "react";
-import Astitva from "../../assets/company-owner/astitva.jpeg"
+import Astitva from "../../assets/company-owner/astitva.png"
 import Yash from "../../assets/company-owner/yash.png"
 import Rajneesh from "../../assets/company-owner/rajneesh.png"
 

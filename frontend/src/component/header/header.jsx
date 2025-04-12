@@ -3,11 +3,29 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes,faBars,faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { clearSessionData, getSessionData, removeSessionData } from "../../services/session.service"
+import { clearSessionData, getSessionData } from "../../services/session.service"
+import { routes } from "../../routes/routes"
+import { useAuth } from "../../providers/Auth/AuthProvider"
+import {toast} from 'react-toastify'
 
 export const Header=()=>{
   const [isOpen, setIsOpen] = useState(false);
+  const {user,logout} = useAuth();
   const navigate = useNavigate();
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try{
+      const response = await logout();
+      
+      toast.success("Logged out successfully!")
+    }catch(err){
+      console.error(err);
+    }
+    clearSessionData();
+    navigate(routes.landing);
+  }
+
     return (
         <>
        <div className="w-full ">
@@ -25,7 +43,7 @@ export const Header=()=>{
       >
         <ul className="mt-4 space-y-2 bg-gray-700 p-4 rounded-lg">
           <li>
-            <Link to="/" className="block text-white hover:text-gray-300">Home</Link>
+            <Link to="/home" className="block text-white hover:text-gray-300">Home</Link>
           </li>
           <li>
             <Link to="/about" className="block text-white hover:text-gray-300">About</Link>
@@ -51,16 +69,16 @@ export const Header=()=>{
   />
 </div>
    <ul className="flex [&>*]:flex text-md align-center max-lg:hidden">
-    <li className="items-center p-6"><Link to="/" className="hover:text-blue-600">Home</Link></li>
+    <li className="items-center p-6"><Link to="/home" className="hover:text-blue-600">Home</Link></li>
     <li className="items-center p-6"><Link to="/about" className="hover:text-blue-600">About</Link></li>
     <li className="items-center p-6"><a href="#" className="hover:text-blue-600">Blog</a></li>
     <li className="items-center p-6"><a href="#" className="hover:text-blue-600">Support</a></li>
    </ul>
    </div>
    <div class="flex items-center max-md:hidden">
-    {getSessionData("email") ? (
+    {user?.email ? (
       <div>
-      <button className="p-3 bg-blue-600 w-40 text-white text-lg font-semibold rounded ml-4 hover:bg-blue-700 cursor-pointer" onClick={(e) => {e.preventDefault();clearSessionData();navigate('/');}}>Logout</button>
+      <button className="p-3 bg-blue-600 w-40 text-white text-lg font-semibold rounded ml-4 hover:bg-blue-700 cursor-pointer" onClick={(e) => handleLogout(e)}>Logout</button>
       </div>
     ):(
       <div className="">

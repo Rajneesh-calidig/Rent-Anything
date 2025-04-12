@@ -1,6 +1,7 @@
 import { Link, redirect, useNavigate } from "react-router-dom"
 import { useAuth } from "../../providers/Auth/AuthProvider"
 import { useState } from "react"
+import { toast } from 'react-toastify';
 export const SignIn=()=>{
   const loginDetails = {
     emailOrNumber:"",
@@ -10,7 +11,6 @@ export const SignIn=()=>{
   const handleChange = (e) => {
     const { name, value } = e.target;
     setLoginData({ ...loginData, [name]: value });
-    console.log(loginData)
   }
 
   const {login} = useAuth();
@@ -20,7 +20,8 @@ export const SignIn=()=>{
     try {
       const response = await login(loginData);
       console.log(response.data);
-      alert('Login successful!');
+      
+      toast.success('Login Successful!');
       navigate('/dashboard')
       // Handle successful login, e.g., redirect to dashboard or show success message
     } catch (error) {

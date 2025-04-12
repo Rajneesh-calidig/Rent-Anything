@@ -54,7 +54,7 @@ export async function signup(req, res) {
 
 export async function getUser(req, res) {
   try {
-    const userId = req.user._id;
+    const userId = req.user.userId;
     const user = await findUserById(userId);
 
     if (!user) {

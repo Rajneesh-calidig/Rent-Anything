@@ -1,67 +1,116 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getSessionData } from '../services/session.service'
+import { useAuth } from '../providers/Auth/AuthProvider'
+import { useUser } from '../providers/User/UserProvider'
 
 const Dashboard = () => {
-    const [activeSection, setActiveSection] = useState("Account")
+  const [activeSection, setActiveSection] = useState("Account")
+  const {user} = useAuth();
+  console.log(user)
+  const { updateProfile, updateDetails, updatePassword, applyKYC, isLoading } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const [basicInfo, setBasicInfo] = useState({
+    name: "",
+    email: "",
+    mobileNumber: "",
+  });
+
+  useEffect(() => {
+    setBasicInfo({
+      name:user.name,email:user.email,mobileNumber:user.mobileNumber
+    });
+  },[user])
+  
+  const [kycInfo, setKycInfo] = useState({
+    aadharCardNumber: "",
+    aadharCardImage: null,
+    panCardNumber: "",
+    panCardImage: null,
+    // addressType: "",
+    // addressProof: "",
+  });
+  
+  const [bankInfo, setBankInfo] = useState({
+    accountType: "",
+    bankName: "",
+    branchName: "",
+    ifscCode: "",
+    accountNumber: "",
+  });
+  
+  const [passwordInfo, setPasswordInfo] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const handleInputChange = (setter) => (e) => {
+    const { name, value, files } = e.target;
+    setter(prev => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
+  };
+
+  const handleSubmitBasicInfo = async (e) => {
+    e.preventDefault();
+    try {
+      await updateDetails(user._id, basicInfo);
+      alert("Basic Info updated");
+    } catch (err) {
+      alert("Error updating Basic Info");
+    }
+  };
+
+  const handleSubmitKYC = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("aadhardCardImage", kycInfo.aadhaarFile);
+    formData.append("panCardImage", kycInfo.panFile);
+    formData.append("aadhaarNo", kycInfo.aadhaarNo);
+    formData.append("panNo", kycInfo.panNo);
+    formData.append("addressType", kycInfo.addressType);
+    formData.append("addressProof", kycInfo.addressProof);
+
+    try {
+      await applyKYC(user._id, formData);
+      alert("KYC submitted");
+    } catch (err) {
+      alert("Error submitting KYC");
+    }
+  };
+
+  const handleSubmitBankInfo = async (e) => {
+    e.preventDefault();
+    try {
+      await updateDetails(user._id, bankInfo);
+      alert("Bank Info updated");
+    } catch (err) {
+      alert("Error updating Bank Info");
+    }
+  };
+
+  const handleSubmitPassword = async (e) => {
+    e.preventDefault();
+    if (passwordInfo.newPassword !== passwordInfo.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      await updatePassword(user._id, {
+        currentPassword: passwordInfo.currentPassword,
+        newPassword: passwordInfo.newPassword,
+      });
+      alert("Password updated");
+    } catch (err) {
+      alert("Error updating password");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#FFF8F0]">
-      {/* Header */}
-      {/* <header className="flex flex-wrap justify-between items-center px-4 sm:px-6 py-3 bg-white shadow-sm">
-        <div className="flex items-center">
-          <div className="text-2xl sm:text-3xl font-bold">
-            <span className="text-[#001F5B]">R</span>
-            <span className="text-[#FF7A00]">4</span>
-            <span className="text-[#001F5B]">ME</span>
-          </div>
-          <div className="h-6 ml-1 border-l-2 border-[#FF7A00]"></div>
-          <span className="text-xs text-gray-500 ml-1">realestate.com</span>
-        </div>
-
-        <div className="flex items-center gap-2 ml-auto">
-          <span className="text-gray-600 hidden sm:inline">Yash Kumar</span>
-          <div className="flex items-center text-[#FF7A00]">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path
-                fillRule="evenodd"
-                d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <div className="relative">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-6 h-6 text-[#FF7A00]"
-            >
-              <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-            </svg>
-            <div className="absolute -top-1 -right-1 bg-[#001F5B] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              0
-            </div>
-          </div>
-        </div>
-
-        <button className="block md:hidden ml-4 text-[#001F5B]" onClick={() => setSidebarOpen(!sidebarOpen)}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"}
-            />
-          </svg>
-        </button>
-      </header> */}
 
       <div className="flex flex-col md:flex-row max-h-screen">
         {/* Sidebar - Hidden on mobile unless toggled */}
@@ -177,7 +226,7 @@ const Dashboard = () => {
           <div className="mt-6 border rounded-lg p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#001F5B] mb-4 sm:mb-6">Basic Details</h2>
 
-            <div className="space-y-4 sm:space-y-6">
+            {/* <div className="space-y-4 sm:space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
                 <label className="text-gray-700 font-medium">Name</label>
                 <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">Yash Kumar</div>
@@ -196,16 +245,22 @@ const Dashboard = () => {
                   placeholder="Enter your phone number"
                 />
               </div>
-            </div>
+            </div> */}
+            <form onSubmit={handleSubmitBasicInfo} className="space-y-4">
+              <input name="name" value={basicInfo.name} onChange={handleInputChange(setBasicInfo)} placeholder="Name" className="w-full p-2 border rounded" />
+              <input name="email" value={basicInfo.email} onChange={handleInputChange(setBasicInfo)} placeholder="Email" className="w-full p-2 border rounded" />
+              <input name="mobileNumber" value={basicInfo.mobileNumber} onChange={handleInputChange(setBasicInfo)} placeholder="Phone" className="w-full p-2 border rounded" />
+              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save Basic Info</button>
+            </form>
           </div>
 
           {/* KYC Details */}
-          <form action="" className="">
+          {/* <form action="" className=""> */}
 
           <div className="mt-6 border rounded-lg p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#001F5B] mb-4 sm:mb-6">KYC Details</h2>
 
-            <div className="space-y-4 sm:space-y-6">
+            {/* <div className="space-y-4 sm:space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
                 <label className="text-gray-700 font-medium">Aadhaar No. *</label>
                 <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">Yash Kumar</div>
@@ -248,17 +303,26 @@ const Dashboard = () => {
                   placeholder="Enter your phone number"
                 />
               </div>
-            </div>
+            </div> */}
+            <form onSubmit={handleSubmitKYC} className="space-y-4">
+              <input name="aadhaarNo" value={kycInfo.aadhaarNo} onChange={handleInputChange(setKycInfo)} placeholder="Aadhaar Number" className="w-full p-2 border rounded" />
+              <input type="file" name="aadhaarFile" onChange={handleInputChange(setKycInfo)} className="w-full p-2 border rounded" />
+              <input name="panNo" value={kycInfo.panNo} onChange={handleInputChange(setKycInfo)} placeholder="PAN Number" className="w-full p-2 border rounded" />
+              <input type="file" name="panFile" onChange={handleInputChange(setKycInfo)} className="w-full p-2 border rounded" />
+              <input name="addressType" value={kycInfo.addressType} onChange={handleInputChange(setKycInfo)} placeholder="Address Type" className="w-full p-2 border rounded" />
+              <input name="addressProof" value={kycInfo.addressProof} onChange={handleInputChange(setKycInfo)} placeholder="Address Proof" className="w-full p-2 border rounded" />
+              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Submit KYC</button>
+            </form>
           </div>
-          </form>
+          {/* </form> */}
 
           {/* Bank Details */}
-          <form action="" className="">
+          {/* <form action="" className=""> */}
 
           <div className="mt-6 border rounded-lg p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#001F5B] mb-4 sm:mb-6">Bank Details</h2>
 
-            <div className="space-y-4 sm:space-y-6">
+            {/* <div className="space-y-4 sm:space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
                 <label className="text-gray-700 font-medium">Account Type</label>
                 <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">Yash Kumar</div>
@@ -293,9 +357,17 @@ const Dashboard = () => {
                   placeholder="Enter your phone number"
                 />
               </div>
-            </div>
+            </div> */}
+            <form onSubmit={handleSubmitBankInfo} className="space-y-4">
+              <input name="accountType" value={bankInfo.accountType} onChange={handleInputChange(setBankInfo)} placeholder="Account Type" className="w-full p-2 border rounded" />
+              <input name="bankName" value={bankInfo.bankName} onChange={handleInputChange(setBankInfo)} placeholder="Bank Name" className="w-full p-2 border rounded" />
+              <input name="branchName" value={bankInfo.branchName} onChange={handleInputChange(setBankInfo)} placeholder="Branch Name" className="w-full p-2 border rounded" />
+              <input name="ifscCode" value={bankInfo.ifscCode} onChange={handleInputChange(setBankInfo)} placeholder="IFSC Code" className="w-full p-2 border rounded" />
+              <input name="accountNumber" value={bankInfo.accountNumber} onChange={handleInputChange(setBankInfo)} placeholder="Account Number" className="w-full p-2 border rounded" />
+              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save Bank Info</button>
+            </form>
           </div>
-          </form>
+          {/* </form> */}
 
           {/* transactions */}
           <div className="border border-orange-600 rounded-lg mt-6 h-[200px] p-4 sm:p-6">
@@ -306,12 +378,12 @@ const Dashboard = () => {
           </div>
 
           {/* Change Password */}
-          <form action="" className="">
+          {/* <form action="" className=""> */}
 
           <div className="mt-6 border rounded-lg p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#001F5B] mb-4 sm:mb-6">Change Password</h2>
 
-            <div className="space-y-4 sm:space-y-6">
+            {/* <div className="space-y-4 sm:space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
                 <label className="text-gray-700 font-medium">Current Password</label>
                 <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">Yash Kumar</div>
@@ -330,9 +402,15 @@ const Dashboard = () => {
                   placeholder="Enter your phone number"
                 />
               </div>
-            </div>
+            </div> */}
+            <form onSubmit={handleSubmitPassword} className="space-y-4">
+              <input type="password" name="currentPassword" value={passwordInfo.currentPassword} onChange={handleInputChange(setPasswordInfo)} placeholder="Current Password" className="w-full p-2 border rounded" />
+              <input type="password" name="newPassword" value={passwordInfo.newPassword} onChange={handleInputChange(setPasswordInfo)} placeholder="New Password" className="w-full p-2 border rounded" />
+              <input type="password" name="confirmPassword" value={passwordInfo.confirmPassword} onChange={handleInputChange(setPasswordInfo)} placeholder="Confirm Password" className="w-full p-2 border rounded" />
+              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Change Password</button>
+            </form>
           </div>
-          </form>
+          {/* </form> */}
         </div>
       </div>
     </div>
