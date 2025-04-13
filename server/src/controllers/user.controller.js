@@ -1,7 +1,9 @@
 import User from "../models/User.js";
 import fs from 'fs'
 import httpStatus from "../utils/httpStatus.js";
+import { fileURLToPath } from 'url'
 import bcrypt from 'bcrypt'
+import path from 'path'
 
 export const updateUserProfile = async (req,res) => {
     try{
@@ -12,6 +14,9 @@ export const updateUserProfile = async (req,res) => {
         if(!user){
             return res.status(404).json({error:"User Not Found!"})
         }
+
+        const __filename = fileURLToPath(import.meta.url)
+        const __dirname = path.dirname(__filename)
     
         // Delete old image if already exist
         if(req.file && user.profileImage){
@@ -73,8 +78,9 @@ export const updateUserPassword = async (req,res) => {
 
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
+        console.log(user.password,newPassword)
 
-        const isMatch = await user.matchPassword(currentPassword);
+        const isMatch = await bcrypt.compare(currentPassword,user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Old password is incorrect' });
         }
@@ -98,21 +104,30 @@ export const applyKYC = async (req,res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ error: 'User not found' });
 
-        if (req.file) {
-            if (req.file.fieldname === 'aadharCardImage') {
-            user.aadharCardImage = `/public/images/aadharImages/${req.file.filename}`;
-            } else if (req.file.fieldname === 'panCardImage') {
-            user.panCardImage = `/public/images/panCardImages/${req.file.filename}`;
-            }
-        }
+        // if (req.file) {
+        //     console.log('3')
+        //     console.log(req.file)
+        //     if (req.file.fieldname === 'aadhaarCardImage') {
+        //     user.aadhaarCardImage = `/public/images/aadhaarImages/${req.file.filename}`;
+        //     } else if (req.file.fieldname === 'panCardImage') {
+        //     user.panCardImage = `/public/images/panCardImages/${req.file.filename}`;
+        //     }
+        // }
 
-        if (req.body.aadharCardNumber) {
-            user.aadharCardNumber = req.body.aadharCardNumber;
+        const aadhaarCardImage = req.files['aadhaarCardImage'][0];
+        const panCardImage = req.files['panCardImage'][0];
+        user.aadhaarCardImage = `/public/images/aadhaarImages/${aadhaarCardImage.filename}`;
+        user.panCardImage = `/public/images/panCardImages/${panCardImage.filename}`;
+
+        if (req.body.aadhaarCardNumber) {
+            user.aadhaarCardNumber = req.body.aadhaarCardNumber;
         }
 
         if (req.body.panCardNumber) {
             user.panCardNumber = req.body.panCardNumber;
         }
+
+        user.KYCVerified = 'PENDING';
 
         await user.save();
         res.status(200).json({ message: 'Documents uploaded successfully', user });

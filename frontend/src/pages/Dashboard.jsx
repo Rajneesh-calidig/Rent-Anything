@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { getSessionData } from '../services/session.service'
 import { useAuth } from '../providers/Auth/AuthProvider'
 import { useUser } from '../providers/User/UserProvider'
+import {toast} from "react-toastify";
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("Account")
-  const {user} = useAuth();
-  console.log(user)
+  const {user,updateUser} = useAuth();
   const { updateProfile, updateDetails, updatePassword, applyKYC, isLoading } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const [previewImage, setPreviewImage] = useState(null);
 
   const [basicInfo, setBasicInfo] = useState({
     name: "",
@@ -23,8 +25,8 @@ const Dashboard = () => {
   },[user])
   
   const [kycInfo, setKycInfo] = useState({
-    aadharCardNumber: "",
-    aadharCardImage: null,
+    aadhaarCardNumber: "",
+    aadhaarCardImage: null,
     panCardNumber: "",
     panCardImage: null,
     // addressType: "",
@@ -53,11 +55,29 @@ const Dashboard = () => {
     }));
   };
 
+  const handleUpdateProfileImage = async (e) => {
+    e.preventDefault();
+
+    setPreviewImage(URL.createObjectURL(e.target.files[0]));
+
+    const formData = new FormData();
+    formData.append("profileImage", e.target.files[0]);
+    try {
+      await updateProfile(user._id, formData);
+      toast.success("Profile image updated successfully!");
+    } catch (err) {
+      toast.error("Error updating profile image");
+    }
+  }
+
   const handleSubmitBasicInfo = async (e) => {
     e.preventDefault();
     try {
-      await updateDetails(user._id, basicInfo);
-      alert("Basic Info updated");
+      console.log(basicInfo,user._id)
+      const response = await updateDetails(user._id, basicInfo);
+      console.log("response",response)
+      toast.success("Basic Info updated successfully!")
+      // alert("Basic Info updated");
     } catch (err) {
       alert("Error updating Basic Info");
     }
@@ -66,35 +86,24 @@ const Dashboard = () => {
   const handleSubmitKYC = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("aadhardCardImage", kycInfo.aadhaarFile);
-    formData.append("panCardImage", kycInfo.panFile);
-    formData.append("aadhaarNo", kycInfo.aadhaarNo);
-    formData.append("panNo", kycInfo.panNo);
-    formData.append("addressType", kycInfo.addressType);
-    formData.append("addressProof", kycInfo.addressProof);
+    formData.append("aadhaarCardImage", kycInfo.aadhaarCardImage);
+    formData.append("panCardImage", kycInfo.panCardImage);
+    formData.append("aadhaarCardNumber", kycInfo.aadhaarCardNumber);
+    formData.append("panCardNumber", kycInfo.panCardNumber);
 
     try {
-      await applyKYC(user._id, formData);
-      alert("KYC submitted");
+      const response = await applyKYC(user._id, formData);
+      updateUser(response.data.user)
+      toast.success("KYC submitted successfully!");
     } catch (err) {
-      alert("Error submitting KYC");
-    }
-  };
-
-  const handleSubmitBankInfo = async (e) => {
-    e.preventDefault();
-    try {
-      await updateDetails(user._id, bankInfo);
-      alert("Bank Info updated");
-    } catch (err) {
-      alert("Error updating Bank Info");
+      toast.error("Error submitting KYC");
     }
   };
 
   const handleSubmitPassword = async (e) => {
     e.preventDefault();
     if (passwordInfo.newPassword !== passwordInfo.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -103,7 +112,8 @@ const Dashboard = () => {
         currentPassword: passwordInfo.currentPassword,
         newPassword: passwordInfo.newPassword,
       });
-      alert("Password updated");
+      toast.success("Password updated successfully!");
+      // alert("Password updated");
     } catch (err) {
       alert("Error updating password");
     }
@@ -177,6 +187,15 @@ const Dashboard = () => {
           {/* Profile Header */}
           <div className="bg-[#001F5B] rounded-lg p-4 sm:p-6 text-white">
             <div className="flex flex-col sm:flex-row items-center">
+              <label className="" htmlFor='profileImage' >
+
+              {
+                user?.profileImage ? (
+                  <img src={previewImage || `${import.meta.env.VITE_FILE_URL}${user?.profileImage}`} alt="Profile" className="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-white" />
+                )
+                :
+                (
+
               <div className="relative mb-4 sm:mb-0">
                 <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-[#006080] flex items-center justify-center border-4 border-white">
                   <svg
@@ -203,6 +222,10 @@ const Dashboard = () => {
                   </svg>
                 </div>
               </div>
+                )
+              }
+              </label>
+              <input id='profileImage' type="file" accept="image/*" onChange={(e) => handleUpdateProfileImage(e)} className="hidden" />
 
               <div className="text-center sm:text-left sm:ml-8">
                 <h1 className="text-2xl sm:text-3xl font-bold mb-1">Hi!</h1>
@@ -304,70 +327,27 @@ const Dashboard = () => {
                 />
               </div>
             </div> */}
-            <form onSubmit={handleSubmitKYC} className="space-y-4">
-              <input name="aadhaarNo" value={kycInfo.aadhaarNo} onChange={handleInputChange(setKycInfo)} placeholder="Aadhaar Number" className="w-full p-2 border rounded" />
-              <input type="file" name="aadhaarFile" onChange={handleInputChange(setKycInfo)} className="w-full p-2 border rounded" />
-              <input name="panNo" value={kycInfo.panNo} onChange={handleInputChange(setKycInfo)} placeholder="PAN Number" className="w-full p-2 border rounded" />
-              <input type="file" name="panFile" onChange={handleInputChange(setKycInfo)} className="w-full p-2 border rounded" />
-              <input name="addressType" value={kycInfo.addressType} onChange={handleInputChange(setKycInfo)} placeholder="Address Type" className="w-full p-2 border rounded" />
-              <input name="addressProof" value={kycInfo.addressProof} onChange={handleInputChange(setKycInfo)} placeholder="Address Proof" className="w-full p-2 border rounded" />
-              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Submit KYC</button>
-            </form>
+            {
+              user?.KYCVerified === "VERIFIED" ? (
+                <div className="">Verification Complete!</div>
+              )
+              :
+              user?.KYCVerified === "PENDING" ? 
+              (
+                <div className="">Verification Under Process!</div>
+              )
+              :
+              (
+              <form onSubmit={(e) => handleSubmitKYC(e)} enctype="multipart/form-data" className="space-y-4">
+                <input name="aadhaarCardNumber" value={kycInfo.aadhaarCardNumber} onChange={handleInputChange(setKycInfo)} placeholder="Aadhaar Number" className="w-full p-2 border rounded" />
+                <input type="file" name="aadhaarCardImage" onChange={handleInputChange(setKycInfo)} className="w-full p-2 border rounded" />
+                <input name="panCardNumber" value={kycInfo.panCardNumber} onChange={handleInputChange(setKycInfo)} placeholder="PAN Number" className="w-full p-2 border rounded" />
+                <input type="file" name="panCardImage" onChange={handleInputChange(setKycInfo)} className="w-full p-2 border rounded" />
+                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Submit KYC</button>
+              </form>
+              )
+            }
           </div>
-          {/* </form> */}
-
-          {/* Bank Details */}
-          {/* <form action="" className=""> */}
-
-          <div className="mt-6 border rounded-lg p-4 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-[#001F5B] mb-4 sm:mb-6">Bank Details</h2>
-
-            {/* <div className="space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Account Type</label>
-                <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">Yash Kumar</div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Bank Name</label>
-                <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">yash.kumar@calidig.com</div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Branch Name</label>
-                <input
-                  type="text"
-                  className="sm:col-span-2 w-full border rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-[#001F5B]"
-                  placeholder="Enter your phone number"
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">IFSC Code</label>
-                <input
-                  type="text"
-                  className="sm:col-span-2 w-full border rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-[#001F5B]"
-                  placeholder="Enter your phone number"
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Account No.</label>
-                <input
-                  type="text"
-                  className="sm:col-span-2 w-full border rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-[#001F5B]"
-                  placeholder="Enter your phone number"
-                />
-              </div>
-            </div> */}
-            <form onSubmit={handleSubmitBankInfo} className="space-y-4">
-              <input name="accountType" value={bankInfo.accountType} onChange={handleInputChange(setBankInfo)} placeholder="Account Type" className="w-full p-2 border rounded" />
-              <input name="bankName" value={bankInfo.bankName} onChange={handleInputChange(setBankInfo)} placeholder="Bank Name" className="w-full p-2 border rounded" />
-              <input name="branchName" value={bankInfo.branchName} onChange={handleInputChange(setBankInfo)} placeholder="Branch Name" className="w-full p-2 border rounded" />
-              <input name="ifscCode" value={bankInfo.ifscCode} onChange={handleInputChange(setBankInfo)} placeholder="IFSC Code" className="w-full p-2 border rounded" />
-              <input name="accountNumber" value={bankInfo.accountNumber} onChange={handleInputChange(setBankInfo)} placeholder="Account Number" className="w-full p-2 border rounded" />
-              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save Bank Info</button>
-            </form>
-          </div>
-          {/* </form> */}
 
           {/* transactions */}
           <div className="border border-orange-600 rounded-lg mt-6 h-[200px] p-4 sm:p-6">

@@ -36,11 +36,11 @@ const userSchema = new Schema(
         profileImage:{
             type:String
         },
-        aadharCardNumber:{
+        aadhaarCardNumber:{
             type:String,
             unique:true
         },
-        aadharCardImage:{
+        aadhaarCardImage:{
             type:String,
         },
         panCardNumber:{
@@ -51,8 +51,9 @@ const userSchema = new Schema(
             type:String
         },
         KYCVerified:{
-            type:Boolean,
-            default:false
+            type:String,
+            default:"NOT VERIFIED",
+            enum:["VERIFIED","NOT VERIFIED","PENDING"]
         }
     },
     { timestamps: true }

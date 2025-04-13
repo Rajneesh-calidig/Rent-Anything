@@ -21,8 +21,32 @@ const createStorage = (folderName) => {
     })
 }
 
+export const uploadKYCDocuments = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        let folder = '';
+        if (file.fieldname === 'aadhaarCardImage') {
+          folder = 'aadhaarImages';
+        } else if (file.fieldname === 'panCardImage') {
+          folder = 'panCardImages';
+        }
+        const uploadPath = path.join(__dirname, '..', 'public/images', folder);
+        fs.mkdirSync(uploadPath, { recursive: true });
+        cb(null, uploadPath);
+      },
+      filename: (req, file, cb) => {
+        const uniqueName = Date.now() + '-' + file.originalname.replace(/\s+/g, '');
+        cb(null, uniqueName);
+      }
+    }),
+    fileFilter: (req, file, cb) => {
+      // Add file validation if needed
+      cb(null, true);
+    }
+  });
+
 export const uploadProfileImage = multer({storage:createStorage('userProfile')})
 export const uploadItemsImages = multer({storage:createStorage('itemImages')})
-export const uploadAadharImage = multer({storage:createStorage('aadharImages')})
+export const uploadaadhaarImage = multer({storage:createStorage('aadhaarImages')})
 export const uploadPanCardImage = multer({storage:createStorage('panCardImages')});
 
