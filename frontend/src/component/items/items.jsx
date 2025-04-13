@@ -1,14 +1,9 @@
-"use client"
-
 import { useState, useEffect } from "react"
-import {Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 function App() {
-  // State for items
   const [items, setItems] = useState([])
-  // State for modal
   const [isModalOpen, setIsModalOpen] = useState(false)
-  // State for form data
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -17,14 +12,10 @@ function App() {
     location: "",
     available: true,
   })
-  // State for form errors
   const [formErrors, setFormErrors] = useState({})
-  // State for form submission error
   const [submissionError, setSubmissionError] = useState("")
-  // State for images
   const [images, setImages] = useState([])
-
-  // Mock data for rental items
+  const navigate = useNavigate();
   const mockItems = [
     {
       id: "1",
@@ -95,11 +86,9 @@ function App() {
   ]
 
   useEffect(() => {
-    // In a real app, you would fetch items from an API
     setItems(mockItems)
   }, [])
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
     setFormData({
@@ -107,7 +96,6 @@ function App() {
       [name]: type === "checkbox" ? checked : value,
     })
 
-    // Clear error for this field when user starts typing
     if (formErrors[name]) {
       setFormErrors({
         ...formErrors,
@@ -116,7 +104,6 @@ function App() {
     }
   }
 
-  // Handle image upload
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files)
 
@@ -137,14 +124,12 @@ function App() {
     }
   }
 
-  // Remove image
   const removeImage = (index) => {
     const newImages = [...images]
     newImages.splice(index, 1)
     setImages(newImages)
   }
 
-  // Validate form
   const validateForm = () => {
     const errors = {}
 
@@ -164,17 +149,14 @@ function App() {
 
     setFormErrors(errors)
 
-    // Return true if no errors
     return Object.keys(errors).length === 0
   }
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault()
     setSubmissionError("")
 
     if (validateForm()) {
-      // In a real app, you would send this to your backend
       const newItem = {
         ...formData,
         id: Date.now().toString(), // Generate a temporary ID
@@ -185,7 +167,6 @@ function App() {
 
       setItems([newItem, ...items])
 
-      // Reset form
       setFormData({
         title: "",
         description: "",
@@ -203,7 +184,6 @@ function App() {
     }
   }
 
-  // Render star rating
   const renderRating = (rating) => {
     const fullStars = Math.floor(rating)
     const hasHalfStar = rating % 1 >= 0.5
@@ -247,7 +227,7 @@ function App() {
         <h1 className="text-3xl font-bold">Available Items for Rent</h1>
         <button
           className="bg-black hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => navigate("/add-item")}
         >
           Add Your Item
         </button>
@@ -306,219 +286,220 @@ function App() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Add a New Item for Rent</h2>
-                <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-gray-700">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+        // <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        //   <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        //     <div className="p-6">
+        //       <div className="flex justify-between items-center mb-4">
+        //         <h2 className="text-2xl font-bold">Add a New Item for Rent</h2>
+        //         <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-gray-700">
+        //           <svg
+        //             xmlns="http://www.w3.org/2000/svg"
+        //             className="h-6 w-6"
+        //             fill="none"
+        //             viewBox="0 0 24 24"
+        //             stroke="currentColor"
+        //           >
+        //             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        //           </svg>
+        //         </button>
+        //       </div>
 
-              {/* Form Submission Error */}
-              {submissionError && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                  <p>{submissionError}</p>
-                </div>
-              )}
+        //       {/* Form Submission Error */}
+        //       {submissionError && (
+        //         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        //           <p>{submissionError}</p>
+        //         </div>
+        //       )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Title */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-md ${
-                      formErrors.title ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="Enter item title"
-                  />
-                  {formErrors.title && <p className="mt-1 text-sm text-red-600">{formErrors.title}</p>}
-                </div>
+        //       <form onSubmit={handleSubmit} className="space-y-6">
+        //         {/* Title */}
+        //         <div>
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+        //           <input
+        //             type="text"
+        //             name="title"
+        //             value={formData.title}
+        //             onChange={handleInputChange}
+        //             className={`w-full px-3 py-2 border rounded-md ${
+        //               formErrors.title ? "border-red-500" : "border-gray-300"
+        //             }`}
+        //             placeholder="Enter item title"
+        //           />
+        //           {formErrors.title && <p className="mt-1 text-sm text-red-600">{formErrors.title}</p>}
+        //         </div>
 
-                {/* Description */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none h-24"
-                    placeholder="Describe your item (max 1000 characters)"
-                    maxLength={1000}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{formData.description.length}/1000 characters</p>
-                </div>
+        //         {/* Description */}
+        //         <div>
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        //           <textarea
+        //             name="description"
+        //             value={formData.description}
+        //             onChange={handleInputChange}
+        //             className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none h-24"
+        //             placeholder="Describe your item (max 1000 characters)"
+        //             maxLength={1000}
+        //           />
+        //           <p className="text-xs text-gray-500 mt-1">{formData.description.length}/1000 characters</p>
+        //         </div>
 
-                {/* Category and Price */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      className={`w-full px-3 py-2 border rounded-md ${
-                        formErrors.category ? "border-red-500" : "border-gray-300"
-                      }`}
-                    >
-                      <option value="">Select a category</option>
-                      <option value="Electronics">Electronics</option>
-                      <option value="Furniture">Furniture</option>
-                      <option value="Books">Books</option>
-                      <option value="Vehicles">Vehicles</option>
-                      <option value="Clothing">Clothing</option>
-                      <option value="Others">Others</option>
-                    </select>
-                    {formErrors.category && <p className="mt-1 text-sm text-red-600">{formErrors.category}</p>}
-                  </div>
+        //         {/* Category and Price */}
+        //         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        //           <div>
+        //             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+        //             <select
+        //               name="category"
+        //               value={formData.category}
+        //               onChange={handleInputChange}
+        //               className={`w-full px-3 py-2 border rounded-md ${
+        //                 formErrors.category ? "border-red-500" : "border-gray-300"
+        //               }`}
+        //             >
+        //               <option value="">Select a category</option>
+        //               <option value="Electronics">Electronics</option>
+        //               <option value="Furniture">Furniture</option>
+        //               <option value="Books">Books</option>
+        //               <option value="Vehicles">Vehicles</option>
+        //               <option value="Clothing">Clothing</option>
+        //               <option value="Others">Others</option>
+        //             </select>
+        //             {formErrors.category && <p className="mt-1 text-sm text-red-600">{formErrors.category}</p>}
+        //           </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Price Per Day ($)</label>
-                    <input
-                      type="number"
-                      name="pricePerDay"
-                      value={formData.pricePerDay}
-                      onChange={handleInputChange}
-                      min="0"
-                      step="0.01"
-                      className={`w-full px-3 py-2 border rounded-md ${
-                        formErrors.pricePerDay ? "border-red-500" : "border-gray-300"
-                      }`}
-                      placeholder="0.00"
-                    />
-                    {formErrors.pricePerDay && <p className="mt-1 text-sm text-red-600">{formErrors.pricePerDay}</p>}
-                  </div>
-                </div>
+        //           <div>
+        //             <label className="block text-sm font-medium text-gray-700 mb-1">Price Per Day ($)</label>
+        //             <input
+        //               type="number"
+        //               name="pricePerDay"
+        //               value={formData.pricePerDay}
+        //               onChange={handleInputChange}
+        //               min="0"
+        //               step="0.01"
+        //               className={`w-full px-3 py-2 border rounded-md ${
+        //                 formErrors.pricePerDay ? "border-red-500" : "border-gray-300"
+        //               }`}
+        //               placeholder="0.00"
+        //             />
+        //             {formErrors.pricePerDay && <p className="mt-1 text-sm text-red-600">{formErrors.pricePerDay}</p>}
+        //           </div>
+        //         </div>
 
-                {/* Location */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    placeholder="City, State"
-                  />
-                </div>
+        //         {/* Location */}
+        //         <div>
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+        //           <input
+        //             type="text"
+        //             name="location"
+        //             value={formData.location}
+        //             onChange={handleInputChange}
+        //             className="w-full px-3 py-2 border border-gray-300 rounded-md"
+        //             placeholder="City, State"
+        //           />
+        //         </div>
 
-                {/* Available */}
-                <div className="flex items-start space-x-3 p-4 border border-gray-300 rounded-md">
-                  <input
-                    type="checkbox"
-                    id="available"
-                    name="available"
-                    checked={formData.available}
-                    onChange={handleInputChange}
-                    className="mt-1"
-                  />
-                  <div>
-                    <label htmlFor="available" className="block text-sm font-medium text-gray-700">
-                      Available for rent
-                    </label>
-                    <p className="text-sm text-gray-500">Uncheck this if the item is not immediately available</p>
-                  </div>
-                </div>
+        //         {/* Available */}
+        //         <div className="flex items-start space-x-3 p-4 border border-gray-300 rounded-md">
+        //           <input
+        //             type="checkbox"
+        //             id="available"
+        //             name="available"
+        //             checked={formData.available}
+        //             onChange={handleInputChange}
+        //             className="mt-1"
+        //           />
+        //           <div>
+        //             <label htmlFor="available" className="block text-sm font-medium text-gray-700">
+        //               Available for rent
+        //             </label>
+        //             <p className="text-sm text-gray-500">Uncheck this if the item is not immediately available</p>
+        //           </div>
+        //         </div>
 
-                {/* Images */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Images</label>
-                  <div className="mt-2 border-2 border-dashed border-gray-300 rounded-md p-6 text-center">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      id="image-upload"
-                      onChange={handleImageUpload}
-                    />
-                    <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-10 w-10 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                        />
-                      </svg>
-                      <p className="mt-2 text-sm text-gray-500">Click to upload images</p>
-                      <p className="text-xs text-gray-400">PNG, JPG, GIF up to 10MB</p>
-                    </label>
-                  </div>
+        //         {/* Images */}
+        //         <div>
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">Images</label>
+        //           <div className="mt-2 border-2 border-dashed border-gray-300 rounded-md p-6 text-center">
+        //             <input
+        //               type="file"
+        //               accept="image/*"
+        //               multiple
+        //               className="hidden"
+        //               id="image-upload"
+        //               onChange={handleImageUpload}
+        //             />
+        //             <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center justify-center">
+        //               <svg
+        //                 xmlns="http://www.w3.org/2000/svg"
+        //                 className="h-10 w-10 text-gray-400"
+        //                 fill="none"
+        //                 viewBox="0 0 24 24"
+        //                 stroke="currentColor"
+        //               >
+        //                 <path
+        //                   strokeLinecap="round"
+        //                   strokeLinejoin="round"
+        //                   strokeWidth={2}
+        //                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+        //                 />
+        //               </svg>
+        //               <p className="mt-2 text-sm text-gray-500">Click to upload images</p>
+        //               <p className="text-xs text-gray-400">PNG, JPG, GIF up to 10MB</p>
+        //             </label>
+        //           </div>
 
-                  {/* Image Previews */}
-                  {images.length > 0 && (
-                    <div className="mt-4 grid grid-cols-3 gap-4">
-                      {images.map((img, index) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={img.preview || "/placeholder.svg"}
-                            alt={`Preview ${index}`}
-                            className="h-24 w-full object-cover rounded-md "
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute top-1 right-1 bg-black bg-opacity-50 rounded-full p-1"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 text-white"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+        //           {/* Image Previews */}
+        //           {images.length > 0 && (
+        //             <div className="mt-4 grid grid-cols-3 gap-4">
+        //               {images.map((img, index) => (
+        //                 <div key={index} className="relative">
+        //                   <img
+        //                     src={img.preview || "/placeholder.svg"}
+        //                     alt={`Preview ${index}`}
+        //                     className="h-24 w-full object-cover rounded-md "
+        //                   />
+        //                   <button
+        //                     type="button"
+        //                     onClick={() => removeImage(index)}
+        //                     className="absolute top-1 right-1 bg-black bg-opacity-50 rounded-full p-1"
+        //                   >
+        //                     <svg
+        //                       xmlns="http://www.w3.org/2000/svg"
+        //                       className="h-4 w-4 text-white"
+        //                       fill="none"
+        //                       viewBox="0 0 24 24"
+        //                       stroke="currentColor"
+        //                     >
+        //                       <path
+        //                         strokeLinecap="round"
+        //                         strokeLinejoin="round"
+        //                         strokeWidth={2}
+        //                         d="M6 18L18 6M6 6l12 12"
+        //                       />
+        //                     </svg>
+        //                   </button>
+        //                 </div>
+        //               ))}
+        //             </div>
+        //           )}
+        //         </div>
 
-                {/* Form Buttons */}
-                <div className="flex justify-end space-x-4">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="px-4 py-2 bg-black text-white rounded-md hover:bg-purple-700">
-                    Add Item
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
+        //         {/* Form Buttons */}
+        //         <div className="flex justify-end space-x-4">
+        //           <button
+        //             type="button"
+        //             onClick={() => setIsModalOpen(false)}
+        //             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+        //           >
+        //             Cancel
+        //           </button>
+        //           <button type="submit" className="px-4 py-2 bg-black text-white rounded-md hover:bg-purple-700">
+        //             Add Item
+        //           </button>
+        //         </div>
+        //       </form>
+        //     </div>
+        //   </div>
+        // </div>
+        <div className=""></div>
       )}
     </div>
   )

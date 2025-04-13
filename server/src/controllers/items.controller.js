@@ -2,13 +2,21 @@ import Item from "../models/item.js"
 
 export const createItem = async (req, res) => {
   try {
+
+    if(!req.files || req.files.length === 0){
+      return res.status(400).json({ message: 'At least one image is required' });
+    }
+
+    const itemsImages = req.files.map(file => (`/public/images/itemImages/${file.filename}`));
     const newItem = new Item({
       ...req.body,
-      ownerId: req.user.id,
+      ownerId: req.user.userId,
+      images:itemsImages,
     });
     const savedItem = await newItem.save();
-    res.status(201).json(savedItem);
+    res.status(201).json({success:true,savedItem});
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: error.message });
   }
 };
@@ -16,7 +24,7 @@ export const createItem = async (req, res) => {
 export const getAllItems = async (req, res) => {
   try {
     const items = await Item.find().populate('ownerId', 'name email');
-    res.status(200).json(items);
+    res.status(200).json({success:true,data:items});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -60,3 +68,7 @@ export const deleteItem = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const searchItems = async (req,res) => {
+  
+}

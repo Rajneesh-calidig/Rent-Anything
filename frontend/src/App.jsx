@@ -5,6 +5,7 @@ import AppRoutes from "./routes/AppRoutes.jsx"
 import { Layout } from "./component/layout/layout.jsx"
 import { ToastContainer } from "react-toastify"
 import { UserProvider } from "./providers/User/UserProvider.jsx"
+import { ItemProvider } from "./providers/Items/ItemProvider.jsx"
  export const App=()=>{
   return (
     <>
@@ -12,10 +13,12 @@ import { UserProvider } from "./providers/User/UserProvider.jsx"
       <InterceptorProvider>
         <AuthProvider>
           <UserProvider>
-            <Layout>
-              <AppRoutes />
-              <ToastContainer />
-            </Layout>
+            <ItemProvider>
+              <Layout>
+                <AppRoutes />
+                <ToastContainer />
+              </Layout>
+            </ItemProvider>
           </UserProvider>
         </AuthProvider>
       </InterceptorProvider>

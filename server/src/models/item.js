@@ -13,12 +13,28 @@ const itemSchema = new Schema({
   category: {
     type: String,
     required: true,
-    enum: ['Electronics', 'Furniture', 'Books', 'Vehicles', 'Clothing', 'Others'],
+    enum: ['Electronics', 'Furniture', 'Books', 'Vehicles', 'Clothing', 'Sports','Outdoor','Tools','Others'],
+  },
+  subCategory: {
+    type:String,
+  },
+  brand:{
+    type:String,
+  },
+  model:{
+    type:String
   },
   pricePerDay: {
     type: Number,
     required: true,
     min: [0, 'Price cannot be negative'],
+  },
+  securityDeposit: {
+    type: Number,
+  },
+  condition:{
+    type:String,
+    enum: ['Like New','Good','Brand New','Excellent','Fair','Acceptable'],
   },
   ownerId: {
     type: mongoose.Schema.Types.ObjectId,

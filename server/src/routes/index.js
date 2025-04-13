@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.use('/auth',authRouter)
 router.use('/user',userRouter)
-router.use('/item',itemRouter)
+router.use('/items',itemRouter)
 router.use('/rental',rentalRouter)
 router.use('/review',reviewRouter)
 
