@@ -75,6 +75,11 @@ export async function login(req, res) {
     const { emailOrNumber, password,rememberMe } = req.body;
     console.log(emailOrNumber,password)
 
+    // const { emailOrNumber, password
+    //   // ,rememberMe 
+    // } = req.body;
+
+
     if (!emailOrNumber || !password) {
       return res
         .status(httpStatus.BAD_REQUEST)
@@ -105,7 +110,9 @@ export async function login(req, res) {
         .json({ success: false, message: "Password is incorrect" });
     }
 
-    generateTokenAndSetCookie(user._id, res, rememberMe);
+    generateTokenAndSetCookie(user._id, res
+      // , rememberMe
+    );
 
     res
       .status(httpStatus.SUCCESS)

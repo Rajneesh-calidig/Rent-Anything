@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useLocation } from "react-router-dom";
+import RazorpayButton from "../payment/payment"
+
 
 export default function RentItemCard() {
   const Location = useLocation();
@@ -98,6 +100,7 @@ export default function RentItemCard() {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="w-full border rounded px-2 py-2 mt-1"
+                required
               />
             </div>
 
@@ -106,7 +109,7 @@ export default function RentItemCard() {
             </div>
 
             <button className="w-full py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-              Proceed to Rent
+             <RazorpayButton item={item} amount={totalAmount * 100}/>
             </button>
           </div>
         </div>
