@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useInterceptor } from "../Interceptor/InterceptorProvider.jsx";
+import { searchItems } from "../../../../server/src/controllers/items.controller.js";
 
 const defaultItems = [];
 
@@ -12,6 +13,7 @@ const ItemContext = React.createContext({
   updateItem: async () => {},
   deleteItem: async () => {},
   setSelectedItem: () => {},
+  searchItems: async () => {},
 });
 
 export const ItemProvider = ({ children }) => {
@@ -82,9 +84,20 @@ export const ItemProvider = ({ children }) => {
     }
   }, [api]);
 
-  useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+  const searchItems = useCallback(async (query) => {
+    try {
+      const response = await api.get(`/items/search`, { params: query });
+      setItems(response.data.data);
+      return response;
+    } catch (err) {
+      console.error("Failed to search items:", err);
+      return Promise.reject(err);
+    }
+  }, [api]);
+
+  // useEffect(() => {
+  //   fetchItems();
+  // }, [fetchItems]);
 
   return (
     <ItemContext.Provider
@@ -97,6 +110,7 @@ export const ItemProvider = ({ children }) => {
         updateItem,
         deleteItem,
         setSelectedItem,
+        searchItems
       }}
     >
       {children}

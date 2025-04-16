@@ -1,4 +1,5 @@
 import Item from "../models/item.js"
+import Rental from "../models/rental.js";
 
 export const createItem = async (req, res) => {
   try {
@@ -69,6 +70,90 @@ export const deleteItem = async (req, res) => {
   }
 };
 
-export const searchItems = async (req,res) => {
-  
-}
+export const searchItems = async (req, res) => {
+  try {
+    const { 
+      location,category,minPrice,maxPrice,rating,sortBy,startDate,endDate,keyword
+    } = req.query;
+    // the start and end date from rentals should both be less than or greater than startDate and endDate from params also as soon as I don't fullfill the condition even from single document then reject that id
+    let notAvailableProducts = [];
+    if(startDate && endDate){
+      notAvailableProducts = await Rental.find({
+        $or: [
+          {startDate: {$gte: new Date(startDate), $lte: new Date(endDate)}},
+          {endDate: {$gte: new Date(startDate), $lte: new Date(endDate)}}
+        ]
+      }).distinct('itemId');
+    }
+    // console.log(startDate,endDate)
+    // console.log(location,category,sortBy,minPrice,maxPrice,rating,startDate,endDate,keyword)
+
+    const query = {
+      $and: [
+        { pricePerDay: { $gte: Number(minPrice || 0), $lte: Number(maxPrice || 5000) } }
+      ]
+    };
+
+    if (keyword) {
+      query.$and.push({
+        $or: [
+          { title: { $regex: keyword || "", $options: 'i' } },
+          { description: { $regex: keyword || "", $options: 'i' } }
+        ]
+      });
+    }
+
+    if (location) {
+      query.$and.push({
+        location: { $regex: location || "", $options: 'i' }
+      });
+    }
+
+    if (category?.length > 0 && category[0] !== "") {
+      query.$and.push({
+        category: { $in: Array.isArray(category) ? category : [category] }
+      });
+    }
+
+    // if (rating > 0) {
+    //   // This assumes you have a way to calculate/query ratings
+    //   // You might need to adjust this based on your actual rating system
+    //   query.$and.push({
+    //     averageRating: { $gte: Number(rating) }
+    //   });
+    // }
+
+    if (startDate && endDate) {
+      query.$and.push({
+        _id: { $nin: notAvailableProducts }
+      });
+    }
+
+    let dbQuery = Item.find(query).populate('ownerId', 'name email');
+
+    if (sortBy) {
+      switch (sortBy) {
+        case 'price-asc':
+          dbQuery = dbQuery.sort({ pricePerDay: 1 });
+          break;
+        case 'price-desc':
+          dbQuery = dbQuery.sort({ pricePerDay: -1 });
+          break;
+        case 'rating':
+          dbQuery = dbQuery.sort({ averageRating: -1 });
+          break;
+        case 'newest':
+          dbQuery = dbQuery.sort({ createdAt: -1 });
+          break;
+        default:
+          dbQuery = dbQuery.sort({ createdAt: -1 });
+      }
+    }
+
+    const items = await dbQuery;
+    res.status(200).json({ success: true,data:items});
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: err.message });
+  }
+};

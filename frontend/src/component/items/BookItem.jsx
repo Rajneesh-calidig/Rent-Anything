@@ -1,27 +1,15 @@
 import { useState, useEffect } from "react"
 import {
-  ChevronLeft,
-  ChevronRight,
-  Star,
-  MapPin,
-  Calendar,
-  Clock,
-  Heart,
-  Share2,
-  ArrowLeft,
-  Check,
-  Shield,
-  RefreshCw,
-} from "lucide-react"
+  ChevronLeft,ChevronRight,Star,MapPin,Calendar,Clock,Heart,Share2,ArrowLeft,Check,Shield,RefreshCw,} from "lucide-react"
 import { useItem } from "../../providers/Items/ItemProvider"
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../providers/Auth/AuthProvider";
 
 export default function BookItem() {
-  // Mock product data
   const {getItem} = useItem();
   const {id} = useParams();
   const {user} = useAuth();
+  const {navigate} = useNavigate();
   const [product, setProduct] = useState({
     id: "1",
     title: "Professional DSLR Camera with 3 Lenses",
@@ -126,7 +114,7 @@ export default function BookItem() {
       setProduct(item)
     }
     fetchItem()
-  })
+  },[getItem])
 
   // State for image gallery
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -214,7 +202,7 @@ export default function BookItem() {
   }
 
   // Custom date input component
-  const DateInput = ({ label, value, onChange, min }) => {
+  const DateInput = ({ label, value, onChange, min,max }) => {
     return (
       <div className="relative">
         <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
@@ -223,6 +211,7 @@ export default function BookItem() {
             type="date"
             value={value}
             min={min}
+            max={max}
             onChange={(e) => onChange(e.target.value)}
             className="w-full p-2 pl-9 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
           />
@@ -231,11 +220,14 @@ export default function BookItem() {
       </div>
     )
   }
+  const navigateBack = () => {
+    navigate(-1)
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 bg-gray-50">
       {/* Back button */}
-      <button className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors">
+      <button className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors cursor-pointer" onClick={navigateBack}>
         <ArrowLeft size={18} className="mr-1" />
         Back to search results
       </button>
@@ -396,7 +388,7 @@ export default function BookItem() {
                 />
                 <div>
                   <div className="flex items-center">
-                    <h3 className="font-medium">{user?.name}</h3>
+                    <h3 className="font-medium">{product?.ownerId?.name}</h3>
                     {product?.owner?.verified && (
                       <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium flex items-center">
                         <Shield size={12} className="mr-1" />
@@ -511,12 +503,14 @@ export default function BookItem() {
                   value={startDate}
                   onChange={setStartDate}
                   min={new Date().toISOString().split("T")[0]}
+                  max={new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString().split("T")[0]}
                 />
                 <DateInput
                   label="End Date"
                   value={endDate}
                   onChange={setEndDate}
                   min={startDate || new Date().toISOString().split("T")[0]}
+                  max={new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString().split("T")[0]}
                 />
               </div>
 

@@ -8,9 +8,9 @@ const router = express.Router();
 
 router.post('/', protectRoute,uploadItemsImages.array('itemsImages',5), createItem);
 router.get('/', getAllItems);
+router.get('/search',searchItems);
 router.get('/:id', getItemById);
 router.put('/:id', protectRoute,uploadItemsImages.array('itemsImages',5), updateItem);
 router.delete('/:id', protectRoute, deleteItem);
-router.get('/search',searchItems);
 
 export default router;

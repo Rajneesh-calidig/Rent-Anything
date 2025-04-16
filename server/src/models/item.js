@@ -53,12 +53,12 @@ const itemSchema = new Schema({
     type: String,
     trim: true,
   },
-}, {
+}, {  
   timestamps: true,
   versionKey: false,
 });
 
-itemSchema.index({ title: 'text', description: 'text' }); // For search
+itemSchema.index({ title: 'text', description: 'text',location:'text' }); // For search
 
 const Item = mongoose.model('Item', itemSchema);
 

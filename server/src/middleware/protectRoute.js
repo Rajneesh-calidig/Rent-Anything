@@ -12,7 +12,7 @@ export const protectRoute = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
+    // console.log(decoded);
     if(decoded){
       const user = await User.findById(decoded.userId)
       if(user.status === "INACTIVE"){
