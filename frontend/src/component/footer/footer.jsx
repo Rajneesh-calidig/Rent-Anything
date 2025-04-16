@@ -8,7 +8,7 @@ export const Footer=()=>{
 
 <footer class="bg-white ">
     <div class="mx-auto w-full max-w-screen-xl">
-      <div class="grid grid-cols-2 gap-8 px-4 py-6 lg:py-8 md:grid-cols-4">
+      {/* <div class="grid grid-cols-2 gap-8 px-4 py-6 lg:py-8 md:grid-cols-4">
         <div>
             <h2 class="mb-6 text-sm font-semibold  uppercase">Company</h2>
             <ul class="text-gray-500  font-medium">
@@ -74,7 +74,7 @@ export const Footer=()=>{
                 </li>
             </ul>
         </div>
-    </div>
+    </div> */}
     <div class="px-4 py-6 bg-gray-300  md:flex md:items-center md:justify-between">
         <span class="text-sm text-gray-600 sm:text-center">© 2023 <a href="https://flowbite.com/">Flowbite™</a>. All Rights Reserved.
         </span>

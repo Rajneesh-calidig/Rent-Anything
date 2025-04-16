@@ -1,5 +1,35 @@
-import { Link } from "react-router-dom"
+import { Link, redirect, useNavigate } from "react-router-dom"
+import { useAuth } from "../../providers/Auth/AuthProvider"
+import { useState } from "react"
+import { toast } from 'react-toastify';
 export const SignIn=()=>{
+  const loginDetails = {
+    emailOrNumber:"",
+    password:""
+  }
+  const [loginData, setLoginData] = useState(loginDetails)
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setLoginData({ ...loginData, [name]: value });
+  }
+
+  const {login} = useAuth();
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await login(loginData);
+      console.log(response.data);
+      
+      toast.success('Login Successful!');
+      navigate('/dashboard')
+      // Handle successful login, e.g., redirect to dashboard or show success message
+    } catch (error) {
+      console.error("Login failed:", error);
+      // Handle login error, e.g., show error message to the user
+    }
+  }
+  
     return (
         <>
     <div className="flex justify-center ">
@@ -29,13 +59,15 @@ export const SignIn=()=>{
     <hr className="w-1/5 text-gray-400 max-sm:hidden"></hr>
   </div>
 
-  <form className="max-w-md mx-auto py-5">
+  <form className="max-w-md mx-auto py-5" onSubmit={(e) => handleSubmit(e)}>
     <div className="relative z-0 w-full mb-5 group">
       <input
-        type="email"
-        name="floating_email"
+        type=""
+        name="emailOrNumber"
         id="floating_email"
-        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+        value={loginData.emailOrNumber}
+        onChange={(e) => handleChange(e)}
+        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
         placeholder=" "
         required
       />
@@ -49,9 +81,11 @@ export const SignIn=()=>{
     <div className="relative z-0 w-full mb-5 group">
       <input
         type="password"
-        name="floating_password"
+        name="password"
+        value={loginData.password}
+        onChange={(e) => handleChange(e)}
         id="floating_password"
-        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
         placeholder=" "
         required
       />

@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useInterceptor } from "../Interceptor/InterceptorProvider.jsx";
-import { clearSessionData } from "../../services/session.service";
+import { clearSessionData, setSessionData } from "../../services/session.service";
 
 const defaultUser = {};
 
@@ -23,8 +23,10 @@ export const AuthProvider = ({ children }) => {
   const getUser = useCallback(async () => {
     try {
       const response = await api.get("/auth/user");
-      if (response?.data?.admin) {
-        updateUser(response.data.admin);
+      if (response?.data?.user) {
+        updateUser(response.data.user);
+        setSessionData("email", response.data.user.email);
+        setSessionData("name", response.data.user.name);
         return response;
       }
     } catch (err) {
@@ -49,7 +51,12 @@ export const AuthProvider = ({ children }) => {
     async (data) => {
       try {
         const response = await api.post("/auth/login", data);
-        getUser();
+        console.log("email",response.data.user.email)
+        setUser(response.data.user)
+        setSessionData("email", response.data.user.email);
+        setSessionData("name", response.data.user.name);
+        // getUser();
+        // setSessionData()
         return response;
       } catch (err) {
         return Promise.reject(err);
@@ -63,6 +70,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post("/auth/logout", {});
       setUser({});
       clearSessionData();
+      console.log(response)
       return response;
     } catch (err) {
       return err.response.data.message;

@@ -13,12 +13,28 @@ const itemSchema = new Schema({
   category: {
     type: String,
     required: true,
-    enum: ['Electronics', 'Furniture', 'Books', 'Vehicles', 'Clothing', 'Others'],
+    enum: ['Electronics', 'Furniture', 'Books', 'Vehicles', 'Clothing', 'Sports','Outdoor','Tools','Others'],
+  },
+  subCategory: {
+    type:String,
+  },
+  brand:{
+    type:String,
+  },
+  model:{
+    type:String
   },
   pricePerDay: {
     type: Number,
     required: true,
     min: [0, 'Price cannot be negative'],
+  },
+  securityDeposit: {
+    type: Number,
+  },
+  condition:{
+    type:String,
+    enum: ['Like New','Good','Brand New','Excellent','Fair','Acceptable'],
   },
   ownerId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -37,12 +53,12 @@ const itemSchema = new Schema({
     type: String,
     trim: true,
   },
-}, {
+}, {  
   timestamps: true,
   versionKey: false,
 });
 
-itemSchema.index({ title: 'text', description: 'text' }); // For search
+itemSchema.index({ title: 'text', description: 'text',location:'text' }); // For search
 
 const Item = mongoose.model('Item', itemSchema);
 
