@@ -1,11 +1,11 @@
 import {BrowserRouter} from "react-router-dom"
 import InterceptorProvider from "./providers/Interceptor/InterceptorProvider"
 import { AuthProvider } from "./providers/Auth/AuthProvider"
-import AppRoutes from "./routes/AppRoutes.jsx"
-import { Layout } from "./component/layout/layout.jsx"
+import { ItemProvider } from "./providers/Items/ItemProvider"
+import { UserProvider } from "./providers/User/UserProvider"
+import { Layout } from "./component/layout/layout"
+import AppRoutes from "./routes/AppRoutes"
 import { ToastContainer } from "react-toastify"
-import { UserProvider } from "./providers/User/UserProvider.jsx"
-import { ItemProvider } from "./providers/Items/ItemProvider.jsx"
  export const App=()=>{
   return (
     <>
@@ -24,5 +24,6 @@ import { ItemProvider } from "./providers/Items/ItemProvider.jsx"
       </InterceptorProvider>
     </BrowserRouter>
     </>
+
   )
 }

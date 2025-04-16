@@ -126,7 +126,7 @@ export default function BookItem() {
       setProduct(item)
     }
     fetchItem()
-  })
+  },[])
 
   // State for image gallery
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
