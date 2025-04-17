@@ -4,13 +4,16 @@ import {
 import { useItem } from "../../providers/Items/ItemProvider"
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../providers/Auth/AuthProvider";
+import RazorpayButton from "../payment/payment";
 
 export default function BookItem() {
   const {getItem} = useItem();
+  const {fetchReviews}=useItem()
   const {id} = useParams();
   const {user} = useAuth();
   const {navigate} = useNavigate();
-  const [product, setProduct] = useState({
+  const [product, setProduct] = useState(
+    {
     id: "1",
     title: "Professional DSLR Camera with 3 Lenses",
     description:
@@ -105,16 +108,20 @@ export default function BookItem() {
         image: "/placeholder.svg?height=200&width=300&text=Stabilizer",
       },
     ],
-  })
+  }
+)
+const [reviews,setReviews]=useState()
 
   useEffect(() => {
     const fetchItem = async () => {
       const item = await getItem(id)
-      console.log(item)
+      const review=await fetchReviews(id)
+      setReviews(review.data)
       setProduct(item)
+      // console.log("revies of set state",review.data)
     }
     fetchItem()
-  },[getItem])
+  },[getItem,fetchReviews])
 
   // State for image gallery
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -412,7 +419,9 @@ export default function BookItem() {
             {/* Reviews */}
             <div className="border-t border-gray-100 my-6 pt-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-semibold">Reviews ({product?.reviews?.length})</h2>
+                {/* <h2 className="text-lg font-semibold">Reviews ({product?.reviews?.length})</h2> */}
+                <h2 className="text-lg font-semibold">Reviews ({reviews?.length})</h2>
+
                 <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">See all reviews</button>
               </div>
 
@@ -564,7 +573,7 @@ export default function BookItem() {
               </div>
 
               <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors">
-                Request to Book
+                <RazorpayButton item={product} amount={(totalPrice + Math.round(totalPrice * 0.1))}/>
               </button>
 
               <div className="mt-4 text-center text-sm text-gray-500">You won't be charged yet</div>

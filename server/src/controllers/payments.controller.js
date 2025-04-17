@@ -35,9 +35,23 @@ export const verifyPayment=async(req,res)=>{
         .update(`${razorpay_order_id}|${razorpay_payment_id}`)
         .digest("hex");
 
+
   if (generatedSignature  === razorpay_signature) {
     // payment is legit
-    res.status(200).json({ success: true, message: "Payment verified successfully" });
+    console.log("payment id",razorpay_payment_id)
+   try{
+    const paymentDetails = await instance.payments.fetch(razorpay_payment_id);
+    console.log("payment details of",paymentDetails)
+    res.status(200).json({
+      success:true,
+      data:paymentDetails
+    })
+   }catch(error){
+    res.status(400).json({
+      success:false,
+      message:error.message
+    })
+   }
   } else {
     res.status(400).json({ success: false, message: "Payment verification failed" });
   }

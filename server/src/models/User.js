@@ -38,14 +38,14 @@ const userSchema = new Schema(
         },
         aadhaarCardNumber:{
             type:String,
-            unique:true
+            unique:true,
         },
         aadhaarCardImage:{
             type:String,
         },
         panCardNumber:{
             type:String,
-            unique:true
+            unique:true,
         },
         panCardImage:{
             type:String
