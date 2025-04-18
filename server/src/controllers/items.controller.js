@@ -73,11 +73,12 @@ export const deleteItem = async (req, res) => {
 export const searchItems = async (req, res) => {
   try {
     const { 
-      location,category,minPrice,maxPrice,rating,sortBy,startDate,endDate,keyword
+      location,category,minPrice,maxPrice,rating,sortBy,startDate,endDate,keyword,includeUnavailableItems
     } = req.query;
     // the start and end date from rentals should both be less than or greater than startDate and endDate from params also as soon as I don't fullfill the condition even from single document then reject that id
+    // console.log(location,category,sortBy,minPrice,maxPrice,rating,startDate,endDate,keyword)
     let notAvailableProducts = [];
-    if(startDate && endDate){
+    if((includeUnavailableItems !== "true") && startDate && endDate){
       notAvailableProducts = await Rental.find({
         $or: [
           {startDate: {$gte: new Date(startDate), $lte: new Date(endDate)}},
@@ -85,8 +86,6 @@ export const searchItems = async (req, res) => {
         ]
       }).distinct('itemId');
     }
-    // console.log(startDate,endDate)
-    // console.log(location,category,sortBy,minPrice,maxPrice,rating,startDate,endDate,keyword)
 
     const query = {
       $and: [
@@ -153,7 +152,7 @@ export const searchItems = async (req, res) => {
     const items = await dbQuery;
     res.status(200).json({ success: true,data:items});
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
     res.status(500).json({ message: err.message });
   }
 };

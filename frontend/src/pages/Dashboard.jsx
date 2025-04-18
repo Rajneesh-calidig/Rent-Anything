@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import { getSessionData } from '../services/session.service'
-import { useAuth } from '../providers/Auth/AuthProvider'
-import { useUser } from '../providers/User/UserProvider'
+import React, { useEffect, useState } from 'react';
+import { getSessionData } from '../services/session.service';
+import { useAuth } from '../providers/Auth/AuthProvider';
+import { useUser } from '../providers/User/UserProvider';
 import {toast} from "react-toastify";
 
 const Dashboard = () => {
@@ -230,17 +230,6 @@ const Dashboard = () => {
               <div className="text-center sm:text-left sm:ml-8">
                 <h1 className="text-2xl sm:text-3xl font-bold mb-1">Hi!</h1>
                 <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">{getSessionData("name")}</h2>
-
-                {/* <div className="flex justify-center sm:justify-start gap-8 sm:gap-16">
-                  <div className="text-center">
-                    <div className="text-3xl sm:text-4xl font-bold">0</div>
-                    <div className="text-[#FF7A00] text-sm sm:text-base">My Ads</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl sm:text-4xl font-bold">0</div>
-                    <div className="text-[#FF7A00] text-sm sm:text-base">Remaining Ads</div>
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>
@@ -248,27 +237,6 @@ const Dashboard = () => {
           {/* Basic Details */}
           <div className="mt-6 border rounded-lg p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#001F5B] mb-4 sm:mb-6">Basic Details</h2>
-
-            {/* <div className="space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Name</label>
-                <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">Yash Kumar</div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Email *</label>
-                <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">yash.kumar@calidig.com</div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Phone Number *</label>
-                <input
-                  type="text"
-                  className="sm:col-span-2 w-full border rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-[#001F5B]"
-                  placeholder="Enter your phone number"
-                />
-              </div>
-            </div> */}
             <form onSubmit={handleSubmitBasicInfo} className="space-y-4">
               <input name="name" value={basicInfo.name} onChange={handleInputChange(setBasicInfo)} placeholder="Name" className="w-full p-2 border rounded" />
               <input name="email" value={basicInfo.email} onChange={handleInputChange(setBasicInfo)} placeholder="Email" className="w-full p-2 border rounded" />
@@ -278,55 +246,8 @@ const Dashboard = () => {
           </div>
 
           {/* KYC Details */}
-          {/* <form action="" className=""> */}
-
           <div className="mt-6 border rounded-lg p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#001F5B] mb-4 sm:mb-6">KYC Details</h2>
-
-            {/* <div className="space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Aadhaar No. *</label>
-                <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">Yash Kumar</div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Aadhaar Doc</label>
-                <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">yash.kumar@calidig.com</div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">PAN No. *</label>
-                <input
-                  type="text"
-                  className="sm:col-span-2 w-full border rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-[#001F5B]"
-                  placeholder="Enter your phone number"
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">PAN Card *</label>
-                <input
-                  type="text"
-                  className="sm:col-span-2 w-full border rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-[#001F5B]"
-                  placeholder="Enter your phone number"
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Address Type*</label>
-                <input
-                  type="text"
-                  className="sm:col-span-2 w-full border rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-[#001F5B]"
-                  placeholder="Enter your phone number"
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Address Proof *</label>
-                <input
-                  type="text"
-                  className="sm:col-span-2 w-full border rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-[#001F5B]"
-                  placeholder="Enter your phone number"
-                />
-              </div>
-            </div> */}
             {
               user?.KYCVerified === "VERIFIED" ? (
                 <div className="">Verification Complete!</div>
@@ -358,31 +279,8 @@ const Dashboard = () => {
           </div>
 
           {/* Change Password */}
-          {/* <form action="" className=""> */}
-
           <div className="mt-6 border rounded-lg p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#001F5B] mb-4 sm:mb-6">Change Password</h2>
-
-            {/* <div className="space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Current Password</label>
-                <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">Yash Kumar</div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">New Password</label>
-                <div className="sm:col-span-2 border rounded-md p-2.5 bg-gray-50">yash.kumar@calidig.com</div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:items-center">
-                <label className="text-gray-700 font-medium">Confirm Password</label>
-                <input
-                  type="text"
-                  className="sm:col-span-2 w-full border rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-[#001F5B]"
-                  placeholder="Enter your phone number"
-                />
-              </div>
-            </div> */}
             <form onSubmit={handleSubmitPassword} className="space-y-4">
               <input type="password" name="currentPassword" value={passwordInfo.currentPassword} onChange={handleInputChange(setPasswordInfo)} placeholder="Current Password" className="w-full p-2 border rounded" />
               <input type="password" name="newPassword" value={passwordInfo.newPassword} onChange={handleInputChange(setPasswordInfo)} placeholder="New Password" className="w-full p-2 border rounded" />
@@ -390,7 +288,7 @@ const Dashboard = () => {
               <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Change Password</button>
             </form>
           </div>
-          {/* </form> */}
+
         </div>
       </div>
     </div>

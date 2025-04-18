@@ -86,6 +86,7 @@ export const ItemProvider = ({ children }) => {
 
   const searchItems = useCallback(async (query) => {
     try {
+      // console.log(query);
       const response = await api.get(`/items/search`, { params: query });
       setItems(response.data.data);
       return response;

@@ -474,7 +474,7 @@ export default function BookItem() {
                   >
                     Daily
                   </button>
-                  <button
+                  {/* <button
                     className={`py-2 px-4 rounded-lg text-sm font-medium ${
                       rentalPeriod === "week"
                         ? "bg-blue-100 text-blue-800 border-blue-300"
@@ -493,7 +493,7 @@ export default function BookItem() {
                     onClick={() => setRentalPeriod("month")}
                   >
                     Monthly
-                  </button>
+                  </button> */}
                 </div>
               </div>
 
@@ -503,7 +503,7 @@ export default function BookItem() {
                   value={startDate}
                   onChange={setStartDate}
                   min={new Date().toISOString().split("T")[0]}
-                  max={new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString().split("T")[0]}
+                  max={ endDate || new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString().split("T")[0]}
                 />
                 <DateInput
                   label="End Date"
