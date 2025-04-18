@@ -43,14 +43,14 @@ export const updateUserDetails = async (req,res) => {
     try {
         const userId = req.params.id;
 
-        const { name, email, phone, address } = req.body;
+        const { name, email, mobileNumber, address } = req.body;
 
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
 
         if (name) user.name = name;
         if (email) user.email = email;
-        if (phone) user.phone = phone;
+        if (mobileNumber) user.mobileNumber = mobileNumber;
         if (address) user.address = address;
 
         const updatedUser = await user.save();
@@ -61,7 +61,7 @@ export const updateUserDetails = async (req,res) => {
             id: updatedUser._id,
             name: updatedUser.name,
             email: updatedUser.email,
-            phone: updatedUser.phone,
+            mobileNumber: updatedUser.mobileNumber,
             address: updatedUser.address
             }
         });

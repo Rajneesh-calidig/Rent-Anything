@@ -483,7 +483,7 @@ const [reviews,setReviews]=useState()
                   >
                     Daily
                   </button>
-                  <button
+                  {/* <button
                     className={`py-2 px-4 rounded-lg text-sm font-medium ${
                       rentalPeriod === "week"
                         ? "bg-blue-100 text-blue-800 border-blue-300"
@@ -502,7 +502,7 @@ const [reviews,setReviews]=useState()
                     onClick={() => setRentalPeriod("month")}
                   >
                     Monthly
-                  </button>
+                  </button> */}
                 </div>
               </div>
 
@@ -512,7 +512,7 @@ const [reviews,setReviews]=useState()
                   value={startDate}
                   onChange={setStartDate}
                   min={new Date().toISOString().split("T")[0]}
-                  max={new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString().split("T")[0]}
+                  max={ endDate || new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString().split("T")[0]}
                 />
                 <DateInput
                   label="End Date"
