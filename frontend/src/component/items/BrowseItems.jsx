@@ -385,7 +385,7 @@
 //   )
 // }
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Search, Star, X, ChevronDown, ChevronUp } from "lucide-react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { useItem } from "../../providers/Items/ItemProvider"
@@ -409,7 +409,7 @@ export default function BrowseItems() {
     dates: true,
   })
 
-  const categories = ["Electronics", "Furniture", "Clothing", "Sports", "Tools", "Vehicles"]
+  const categories = ["All","Electronics", "Furniture", "Clothing", "Sports", "Tools", "Vehicles"]
 
   const toggleSection = (section) => {
     setExpandedSections({
@@ -476,7 +476,7 @@ export default function BrowseItems() {
 
   const clearFilters = () => {
     setFilters({
-      category: "",
+      category: [],
       location: "",
       rating: 0,
       minPrice: 0,
@@ -554,7 +554,19 @@ export default function BrowseItems() {
   }
 
   // Filter section component
-  const FilterSection = ({ title, isExpanded, onToggle, children }) => {
+  // const FilterSection = ({ title, isExpanded, onToggle, children }) => {
+  //   return (
+  //     <div className="border-b pb-4 mb-4">
+  //       <div className="flex justify-between items-center cursor-pointer mb-2" onClick={onToggle}>
+  //         <h3 className="font-semibold text-gray-800">{title}</h3>
+  //         {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+  //       </div>
+  //       {isExpanded && children}
+  //     </div>
+  //   )
+  // }
+  const FilterSection = useCallback(({ title, isExpanded, onToggle, children }) => {
+    // console.log('being rendered',title)
     return (
       <div className="border-b pb-4 mb-4">
         <div className="flex justify-between items-center cursor-pointer mb-2" onClick={onToggle}>
@@ -564,7 +576,7 @@ export default function BrowseItems() {
         {isExpanded && children}
       </div>
     )
-  }
+  },[expandedSections])
 
   const handleUnavailbilityToggle = (checked) => {
     setIncludeUnavailableItems(!checked);

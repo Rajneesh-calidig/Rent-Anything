@@ -75,22 +75,10 @@ export const Header = () => {
               About
             </Link>
             <Link
-              to="/categories"
-              className="px-4 py-2 text-gray-700 hover:text-indigo-600 font-medium rounded-lg transition-colors"
-            >
-              Categories
-            </Link>
-            <Link
               to="/blog"
               className="px-4 py-2 text-gray-700 hover:text-indigo-600 font-medium rounded-lg transition-colors"
             >
               Blog
-            </Link>
-            <Link
-              to="/support"
-              className="px-4 py-2 text-gray-700 hover:text-indigo-600 font-medium rounded-lg transition-colors"
-            >
-              Support
             </Link>
           </nav>
 

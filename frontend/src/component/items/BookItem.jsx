@@ -227,14 +227,14 @@ export default function BookItem() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 bg-gray-50">
       {/* Back button */}
-      <button className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors cursor-pointer" onClick={navigateBack}>
+      {/* <button className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors cursor-pointer" onClick={navigateBack}>
         <ArrowLeft size={18} className="mr-1" />
         Back to search results
-      </button>
+      </button> */}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left column - Image gallery */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 mt-12">
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             {/* Main image */}
             <div
@@ -449,7 +449,7 @@ export default function BookItem() {
           {/* Booking card */}
           {/* <div className="sticky"> */}
 
-          <div className="bg-white rounded-xl shadow-md p-6 sticky top-6">
+          <div className="bg-white rounded-xl shadow-md p-6 sticky top-20">
             <div className="flex justify-between items-center mb-4">
               <div>
                 <span className="text-2xl font-bold text-gray-800">₹{product.pricePerDay}</span>

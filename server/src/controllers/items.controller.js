@@ -75,7 +75,6 @@ export const searchItems = async (req, res) => {
     const { 
       location,category,minPrice,maxPrice,rating,sortBy,startDate,endDate,keyword,includeUnavailableItems
     } = req.query;
-    // the start and end date from rentals should both be less than or greater than startDate and endDate from params also as soon as I don't fullfill the condition even from single document then reject that id
     // console.log(location,category,sortBy,minPrice,maxPrice,rating,startDate,endDate,keyword)
     let notAvailableProducts = [];
     if((includeUnavailableItems !== "true") && startDate && endDate){
@@ -108,7 +107,7 @@ export const searchItems = async (req, res) => {
       });
     }
 
-    if (category?.length > 0 && category[0] !== "") {
+    if (category?.length > 0 && category[0] !== "All") {
       query.$and.push({
         category: { $in: Array.isArray(category) ? category : [category] }
       });

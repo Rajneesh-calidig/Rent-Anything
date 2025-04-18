@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom"
 export const Home = () => {
   const scrollRef = useRef(null)
   const [dateRange, setDateRange] = useState({ start: "", end: "" })
-  const [category, setCategory] = useState("")
+  const [category, setCategory] = useState("All")
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 })
   const navigate = useNavigate();
 
@@ -128,7 +128,7 @@ export const Home = () => {
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
-                  <option value="">All Categories</option>
+                  <option value="All">All Categories</option>
                   {categories.map((cat, index) => (
                     <option key={index} value={cat}>
                       {cat}
