@@ -1,4 +1,5 @@
-import { Link, redirect, useNavigate } from "react-router-dom"
+
+import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../../providers/Auth/AuthProvider"
 import { useState } from "react"
 import { toast } from 'react-toastify';
@@ -59,21 +60,20 @@ export const SignIn=()=>{
     <hr className="w-1/5 text-gray-400 max-sm:hidden"></hr>
   </div>
 
-  <form className="max-w-md mx-auto py-5" onSubmit={(e) => handleSubmit(e)}>
+  <form className="max-w-md mx-auto py-5"  onSubmit={(e) => handleSubmit(e)}>
     <div className="relative z-0 w-full mb-5 group">
-      <input
-        type=""
+     <input
+        type="email"
         name="emailOrNumber"
         id="floating_email"
-        value={loginData.emailOrNumber}
-        onChange={(e) => handleChange(e)}
-        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+        className="block py-2.5 px-0 w-full text-sm text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
         placeholder=" "
         required
-      />
+        onChange={(e) => handleChange(e)} value={loginData.emailOrNumber}
+      /> 
       <label
         htmlFor="floating_email"
-        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6" 
       >
         Email/Phone Number
       </label>
@@ -82,12 +82,11 @@ export const SignIn=()=>{
       <input
         type="password"
         name="password"
-        value={loginData.password}
-        onChange={(e) => handleChange(e)}
         id="floating_password"
-        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+        className="block py-2.5 px-0 w-full text-sm text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
         placeholder=" "
-        required
+        required 
+        onChange={(e) => handleChange(e)} value={loginData.password}
       />
       <label
         htmlFor="floating_password"

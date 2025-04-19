@@ -3,6 +3,7 @@ import Astitva from "../../assets/company-owner/astitva.png"
 import Yash from "../../assets/company-owner/yash.png"
 import Rajneesh from "../../assets/company-owner/rajneesh.png"
 
+
 export const About = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4 py-10">
@@ -57,13 +58,13 @@ export const About = () => {
           <h3 className="text-2xl font-semibold text-center text-gray-800">Meet Our Team</h3>
           <div className="mt-6 flex flex-wrap justify-center gap-6">
             {[
-              { name: "Astitva Singh Tomar", role: "CEO",img:Astitva },
-              { name: "Yash Kumar", role: "CTO", img: Yash },
-              { name: "Rajneesh Dadheech", role: "Marketing Head", img: Rajneesh },
+              { name: "Astitva Singh Tomar", role: "CEO",img:"Astitva" },
+              { name: "Yash Kumar", role: "CTO", img: "Yash" },
+              { name: "Rajneesh Dadheech", role: "Marketing Head", img: "Rajneesh" },
             ].map((member, index) => (
               <div key={index} className="text-center">
                 <div className="w-32 h-32 bg-gray-300 rounded-full mx-auto">
-                    <img src={member.img} className="w-32 h-32 bg-gray-300 rounded-full mx-auto"/>
+                    {/* <img src={member.img} className="w-32 h-32 bg-gray-300 rounded-full mx-auto"/> */}
                 </div>
                 <h4 className="mt-3 font-semibold text-gray-800">{member.name}</h4>
                 <p className="text-gray-600">{member.role}</p>
