@@ -50,10 +50,10 @@ const userSchema = new Schema(
         panCardImage:{
             type:String
         },
-        KYCVerified:{
+        kycStatus:{
             type:String,
-            default:"NOT VERIFIED",
-            enum:["VERIFIED","NOT VERIFIED","PENDING"]
+            default:"NOT SUBMITTED",
+            enum:["VERIFIED","NOT SUBMITTED","PENDING"]
         }
     },
     { timestamps: true }

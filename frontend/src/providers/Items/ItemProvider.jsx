@@ -1,11 +1,15 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useInterceptor } from "../Interceptor/InterceptorProvider.jsx";
 import { searchItems } from "../../../../server/src/controllers/items.controller.js";
+import { createReview } from "../../../../server/src/controllers/review.controller.js";
+import { useAuth } from "../Auth/AuthProvider.jsx";
 
 const defaultItems = [];
 
 const ItemContext = React.createContext({
   items: defaultItems,
+  myItems: defaultItems,
+  reviews: [],
   selectedItem: null,
   fetchItems: async () => {},
   getItem: async () => {},
@@ -14,11 +18,17 @@ const ItemContext = React.createContext({
   deleteItem: async () => {},
   setSelectedItem: () => {},
   searchItems: async () => {},
+  createReview: async () => {},
+  getReviews: async () => {},
+  getMyItems: async () => {},
 });
 
 export const ItemProvider = ({ children }) => {
   const { api } = useInterceptor();
+  const {user} = useAuth();
   const [items, setItems] = useState(defaultItems);
+  const [myItems, setMyItems] = useState(defaultItems);
+  const [reviews,setReviews] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
 
   const fetchItems = useCallback(async () => {
@@ -39,6 +49,20 @@ export const ItemProvider = ({ children }) => {
       return response.data;
     } catch (err) {
       console.error(`Failed to get item with id ${id}:`, err);
+      return Promise.reject(err);
+    }
+  }, [api]);
+
+  const getMyItems = useCallback(async (userId) => {
+    try {
+      const response = await api.get(`/items/my-items/${userId}`);
+      if(response.data.message === "success"){
+        setMyItems(response.data.data);
+      }
+      console.log(response.data.data);
+      return response;
+    } catch (err) {
+      console.error(`Failed to get items for user with id ${userId}:`, err);
       return Promise.reject(err);
     }
   }, [api]);
@@ -86,9 +110,19 @@ export const ItemProvider = ({ children }) => {
 
   const searchItems = useCallback(async (query) => {
     try {
-      console.log(query);
       const response = await api.get(`/items/search`, { params: query });
       setItems(response.data.data);
+      console.log(response.data.data);
+      return response;
+    } catch (err) {
+      console.error("Failed to search items:", err);
+      return Promise.reject(err);
+    }
+  }, [api]);
+  
+  const createReview = useCallback(async (data) => {
+    try {
+      const response = await api.post(`/review`, data);
       return response;
     } catch (err) {
       console.error("Failed to search items:", err);
@@ -96,14 +130,29 @@ export const ItemProvider = ({ children }) => {
     }
   }, [api]);
 
-  // useEffect(() => {
-  //   fetchItems();
-  // }, [fetchItems]);
+  const getReviews = useCallback(async (id) => {
+    try {
+      const response = await api.get(`/review/${id}/reviews`);
+      setReviews(response.data);
+      return response.data;
+    } catch (err) {
+      console.error(`Failed to get item with id ${id}:`, err);
+      return Promise.reject(err);
+    }
+  }, [api]);
+
+  useEffect(() => {
+    if(user._id){
+      getMyItems(user._id);
+    }
+  }, [getMyItems,user]);
 
   return (
     <ItemContext.Provider
       value={{
         items,
+        myItems,
+        reviews,
         selectedItem,
         fetchItems,
         getItem,
@@ -111,7 +160,10 @@ export const ItemProvider = ({ children }) => {
         updateItem,
         deleteItem,
         setSelectedItem,
-        searchItems
+        searchItems,
+        createReview,
+        getReviews,
+        getMyItems
       }}
     >
       {children}

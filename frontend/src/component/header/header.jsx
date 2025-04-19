@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTimes, faBars, faMagnifyingGlass, faUser, faHeart, faShoppingCart } from "@fortawesome/free-solid-svg-icons"
 import Logo from "../../assets/img/logo.png"
@@ -11,6 +11,7 @@ import { toast } from "react-toastify"
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const location = useLocation();
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -44,9 +45,9 @@ export const Header = () => {
 
   return (
     <header
-      className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`w-full top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
-      }`}
+      } ${location.pathname === "/dashboard" ? "" : "fixed"}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">

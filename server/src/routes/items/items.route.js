@@ -1,6 +1,6 @@
 import  express from 'express';
 import { protectRoute } from "../../middleware/protectRoute.js";
-import {createItem,getAllItems,getItemById,updateItem,deleteItem, searchItems} from '../../controllers/items.controller.js';
+import {createItem,getAllItems,getItemById,updateItem,deleteItem, searchItems, getMyItems} from '../../controllers/items.controller.js';
 import { uploadItemsImages } from '../../middleware/upload.js';
 
 const router = express.Router();
@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.post('/', protectRoute,uploadItemsImages.array('itemsImages',5), createItem);
 router.get('/', getAllItems);
+router.get('/my-items/:userId', protectRoute, getMyItems);
 router.get('/search',searchItems);
 router.get('/:id', getItemById);
 router.put('/:id', protectRoute,uploadItemsImages.array('itemsImages',5), updateItem);

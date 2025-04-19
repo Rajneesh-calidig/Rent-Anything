@@ -1,5 +1,7 @@
 import Item from "../models/item.js"
 import Rental from "../models/rental.js";
+import Review from "../models/review.js";
+import mongoose from "mongoose";
 
 export const createItem = async (req, res) => {
   try {
@@ -24,8 +26,37 @@ export const createItem = async (req, res) => {
 
 export const getAllItems = async (req, res) => {
   try {
+
+    const avgRating = await Review.aggregate([
+      {
+        $group:{
+          _id:"$itemId",
+          avgRating:{$avg:"$rating"},
+          totalReviews:{$sum:1},
+        }
+      }
+    ])
+
+    const ratingsMap = {};
+    avgRating.forEach(r => {
+      ratingsMap[r._id.toString()] = {
+        avgRating:r.avgRating,
+        totalReviews:r.totalReviews
+      }
+    })
+
     const items = await Item.find().populate('ownerId', 'name email');
-    res.status(200).json({success:true,data:items});
+
+    const itemWithRatings = items.map(item => {
+      const ratingInfo = ratingsMap[item._id.toString()] || { avgRating: 0, totalReviews: 0 };
+      return {
+        ...item.toObject(),
+        avgRating: Number(ratingInfo.avgRating.toFixed(1)),
+        totalReviews: ratingInfo.totalReviews,
+      };
+    })
+  
+    res.status(200).json({success:true,data:itemWithRatings});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -34,9 +65,48 @@ export const getAllItems = async (req, res) => {
 export const getItemById = async (req, res) => {
   try {
     const item = await Item.findById(req.params.id).populate('ownerId', 'name email');
+
+    const { id } = req.params;
+
+    const avgRating = await Review.aggregate([
+      {
+        $match: {
+          itemId: new mongoose.Types.ObjectId(id), // make sure id is ObjectId if your itemId is stored as ObjectId
+        }
+      },
+      {
+        $group: {
+          _id: "$itemId",
+          avgRating: { $avg: "$rating" },
+          totalReviews: { $sum: 1 },
+        }
+      }
+    ]);
+
+
+    const ratingInfo = avgRating[0] || { avgRating: 0, totalReviews: 0 };
+
+    const itemWithRating = {
+      ...item.toObject(),
+      avgRating: Number(ratingInfo.avgRating.toFixed(1)),
+      totalReviews: ratingInfo.totalReviews,
+    };
+    console.log(itemWithRating)
+
     if (!item) return res.status(404).json({ message: 'Item not found' });
-    res.status(200).json(item);
+    res.status(200).json(itemWithRating);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getMyItems = async (req, res) => {
+  try {
+    const items = await Item.find({ ownerId: req.params.userId }).populate('ownerId', 'name email');
+    if (!items) return res.status(404).json({ message: 'No items found for this user' });
+    res.status(200).json({message:"success",data:items});
+  }
+  catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -75,6 +145,24 @@ export const searchItems = async (req, res) => {
     const { 
       location,category,minPrice,maxPrice,rating,sortBy,startDate,endDate,keyword,includeUnavailableItems
     } = req.query;
+
+    const avgRating = await Review.aggregate([
+      {
+        $group:{
+          _id:"$itemId",
+          avgRating:{$avg:"$rating"},
+          totalReviews:{$sum:1},
+        }
+      }
+    ])
+
+    const ratingsMap = {};
+    avgRating.forEach(r => {
+      ratingsMap[r._id.toString()] = {
+        avgRating:r.avgRating,
+        totalReviews:r.totalReviews
+      }
+    })
     // console.log(location,category,sortBy,minPrice,maxPrice,rating,startDate,endDate,keyword)
     let notAvailableProducts = [];
     if((includeUnavailableItems !== "true") && startDate && endDate){
@@ -137,9 +225,6 @@ export const searchItems = async (req, res) => {
         case 'price-desc':
           dbQuery = dbQuery.sort({ pricePerDay: -1 });
           break;
-        case 'rating':
-          dbQuery = dbQuery.sort({ averageRating: -1 });
-          break;
         case 'newest':
           dbQuery = dbQuery.sort({ createdAt: -1 });
           break;
@@ -149,7 +234,21 @@ export const searchItems = async (req, res) => {
     }
 
     const items = await dbQuery;
-    res.status(200).json({ success: true,data:items});
+
+    let itemWithRatings = items.map(item => {
+      const ratingInfo = ratingsMap[item._id.toString()] || { avgRating: 0, totalReviews: 0 };
+      return {
+        ...item.toObject(),
+        avgRating: Number(ratingInfo.avgRating.toFixed(1)),
+        totalReviews: ratingInfo.totalReviews,
+      };
+    })
+
+    if (sortBy === 'rating') {
+      itemWithRatings = itemWithRatings.sort((a, b) => b.avgRating - a.avgRating);
+    }
+
+    res.status(200).json({ success: true,data:itemWithRatings});
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ message: err.message });

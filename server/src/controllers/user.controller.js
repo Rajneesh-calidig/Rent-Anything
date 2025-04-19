@@ -127,7 +127,7 @@ export const applyKYC = async (req,res) => {
             user.panCardNumber = req.body.panCardNumber;
         }
 
-        user.KYCVerified = 'PENDING';
+        user.kycStatus = 'PENDING';
 
         await user.save();
         res.status(200).json({ message: 'Documents uploaded successfully', user });
