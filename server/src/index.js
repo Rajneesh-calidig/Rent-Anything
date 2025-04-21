@@ -17,7 +17,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(cookieParser());
 // app.use(cookies());
 const corsOptions = {
-    origin:'https://rent-anything-frontend.vercel.app/',
+    origin:'https://rent-anything-frontend.vercel.app',
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials:true
 }
