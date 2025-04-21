@@ -260,9 +260,9 @@ export default function AddItem() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 bg-gray-50">
+    <div className="max-w-4xl mx-auto px-4">
       <div className="bg-white rounded-xl shadow-md p-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Add a New Item for Rent</h1>
+        {/* <h1 className="text-2xl font-bold text-gray-800 mb-6">Add a New Item for Rent</h1> */}
 
         <form onSubmit={handleSubmit} enctype="multipart/form-data">
           {/* Basic Information */}
@@ -479,7 +479,7 @@ export default function AddItem() {
                 </p>
               </div> */}
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Security Deposit (₹)</label>
                 <div className="relative">
                   <input
@@ -498,7 +498,7 @@ export default function AddItem() {
                 <p className="mt-1 text-xs text-gray-500">
                   Suggested: ₹{formData.pricePerDay ? Math.round(formData.pricePerDay * 5) : 0}
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 

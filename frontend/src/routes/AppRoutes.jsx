@@ -17,7 +17,7 @@ const AppRoutes = () => {
         <Routes>
 
             <Route path="/" element={<Home />} />
-            <Route path="/home" element={<RentItemsPage />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/about" element={<About />} />
             {/* <Route path="/rent" element={<RentItemCard />} /> */}
             <Route path="/contact-us" element={<Contact />} />
@@ -31,8 +31,8 @@ const AppRoutes = () => {
 
             <Route element={<AuthGuard isProtected={true} />}>
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/add-item" element={<AddItem />} />
-                    <Route path="*" element={<RentItemsPage />} />
+                    {/* <Route path="/add-item" element={<AddItem />} /> */}
+                    <Route path="*" element={<Home />} />
             </Route>
         </Routes>
     )

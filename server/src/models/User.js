@@ -23,7 +23,7 @@ const userSchema = new Schema(
         },
         mobileNumber: {
             type: String,
-            required: true,
+            // required: true,
             unique: true
         },
         address: {
@@ -31,7 +31,7 @@ const userSchema = new Schema(
         },
         password: {
             type: String,
-            required: true
+            // required: this.authType === "EMAIL",
         },
         profileImage:{
             type:String
@@ -50,10 +50,15 @@ const userSchema = new Schema(
         panCardImage:{
             type:String
         },
-        KYCVerified:{
+        kycStatus:{
             type:String,
-            default:"NOT VERIFIED",
-            enum:["VERIFIED","NOT VERIFIED","PENDING"]
+            default:"NOT SUBMITTED",
+            enum:["VERIFIED","NOT SUBMITTED","PENDING"]
+        },
+        authType:{
+            type:String,
+            enum:["EMAIL","GOOGLE"],
+            default:"EMAIL"
         }
     },
     { timestamps: true }

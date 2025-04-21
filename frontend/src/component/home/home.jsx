@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom"
 export const Home = () => {
   const scrollRef = useRef(null)
   const [dateRange, setDateRange] = useState({ start: "", end: "" })
-  const [category, setCategory] = useState("")
+  const [category, setCategory] = useState("All")
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 })
   const navigate = useNavigate();
 
@@ -101,6 +101,8 @@ export const Home = () => {
                   <input
                     type="date"
                     className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    min={new Date().toISOString().split("T")[0]}
+                    max={dateRange.end || new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString().split("T")[0]}
                     value={dateRange.start}
                     onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
                   />
@@ -109,6 +111,8 @@ export const Home = () => {
                     className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     value={dateRange.end}
                     onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                    min={dateRange.start || new Date().toISOString().split("T")[0]}
+                    max={new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString().split("T")[0]}
                   />
                 </div>
               </div>
@@ -124,7 +128,7 @@ export const Home = () => {
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
-                  <option value="">All Categories</option>
+                  <option value="All">All Categories</option>
                   {categories.map((cat, index) => (
                     <option key={index} value={cat}>
                       {cat}

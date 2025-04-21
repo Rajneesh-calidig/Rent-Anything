@@ -6,7 +6,7 @@ import  {createReview,getReviewsByItem,deleteReview} from '../../controllers/rev
 const router = express.Router();
 
 router.post('/', protectRoute,createReview);
-router.get('/:itemId',getReviewsByItem);
+router.get('/:itemId/reviews',getReviewsByItem);
 router.delete('/:id', protectRoute,deleteReview);
 
 export default router;
