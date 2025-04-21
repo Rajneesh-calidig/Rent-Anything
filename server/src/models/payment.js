@@ -1,38 +1,91 @@
-// models/Payment.js
-const mongoose = require('mongoose');
+import mongoose, { Schema } from "mongoose";
 
-const paymentSchema = new mongoose.Schema({
-  rentalId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Rental',
-    required: true,
-  },
-  amount: {
-    type: Number,
-    required: true,
-    min: [0, 'Amount cannot be negative'],
-  },
-  paymentMethod: {
-    type: String,
-    enum: ['card', 'upi', 'netbanking', 'cash'],
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: ['pending', 'completed', 'failed'],
-    default: 'pending',
-  },
-  transactionId: {
-    type: String,
-    unique: true,
-    sparse: true,
-  },
-  paidAt: {
-    type: Date,
-  },
-}, {
-  timestamps: true,
-  versionKey: false,
-});
+const paymentSchema = new mongoose.Schema(
+  {
+    // Razorpay transaction details
+    razorpay_order_id: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    razorpay_payment_id: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    razorpay_signature: {
+      type: String,
+      required: true,
+    },
 
-module.exports = mongoose.model('Payment', paymentSchema);
+    // Razorpay Linked Account (to whom money is transferred)
+    owner_razorpay_account_id: {
+      type: String, // acc_xxxxxxxxxx
+      required: true,
+    },
+
+    // References to your app's data
+    item_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Item',
+      required: true,
+    },
+    rentee_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    owner_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+
+    // Financials
+    amount: {
+      type: Number,
+      required: true,
+    },
+    commission: {
+      type: Number,
+      required: true,
+    },
+    transfer_amount: {
+      type: Number,
+      required: true,
+    },
+
+    // Payout details (optional but helpful)
+    payout_id: {
+      type: String, // if you manually transfer via payout API
+    },
+    payout_status: {
+      type: String,
+      enum: ['pending', 'processed', 'failed'],
+      default: 'pending',
+    },
+
+    // Status of this record
+    status: {
+      type: String,
+      enum: ['pending', 'success', 'failure'],
+      default: 'pending',
+    },
+
+    notes: {
+      type: Map,
+      of: String,
+      default: {},
+    },
+
+    paid_at: {
+      type: Date,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+const payment=mongoose.model('Payment',paymentSchema);
+
+export default payment

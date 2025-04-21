@@ -54,6 +54,9 @@ const userSchema = new Schema(
             type:String,
             default:"NOT VERIFIED",
             enum:["VERIFIED","NOT VERIFIED","PENDING"]
+        },
+        razorpay_account_id:{
+            type:String
         }
     },
     { timestamps: true }
