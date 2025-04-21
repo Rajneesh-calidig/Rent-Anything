@@ -1,9 +1,9 @@
 import { useState } from "react";
+import { getSessionData } from "../../services/session.service";
 
 const razorpayKey = import.meta.env.VITE_key_id;
-const RazorpayButton = ({ amount, item }) => {
+const RazorpayButton = ({item,amount }) => {
   const [loading, setLoading] = useState(false);
-
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement("script");
@@ -13,6 +13,10 @@ const RazorpayButton = ({ amount, item }) => {
       document.body.appendChild(script);
     });
   };
+
+  const userEmail=getSessionData("email")
+  const userName=getSessionData("name")
+
 
   const payNow = async () => {
     const isScriptLoaded = await loadRazorpayScript();
@@ -31,12 +35,12 @@ const RazorpayButton = ({ amount, item }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: amount, // in paisa
+          amount: Number(amount)*100, // in paisa
           itemData: item,
         }),
       });
       const data = await res.json();
-
+console.log("our data is",data)
       const options = {
         key: razorpayKey, // Replace with your Razorpay key
         amount: data.amount,
@@ -74,8 +78,8 @@ const RazorpayButton = ({ amount, item }) => {
           }
         },
         prefill: {
-          name: "User Name",
-          email: "user@example.com",
+          name: userName,
+          email: userEmail,
           contact: "9999999999",
         },
         theme: {

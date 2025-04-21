@@ -10,6 +10,7 @@ const ItemContext = React.createContext({
   reviews: [],
   selectedItem: null,
   fetchItems: async () => {},
+  fetchReviews: async () => {},
   getItem: async () => {},
   addItem: async () => {},
   updateItem: async () => {},
@@ -32,6 +33,16 @@ export const ItemProvider = ({ children }) => {
   const fetchItems = useCallback(async () => {
     try {
       const response = await api.get("/items");
+      setItems(response.data.data);
+      return response;
+    } catch (err) {
+      console.error("Failed to fetch items:", err);
+      return Promise.reject(err);
+    }
+  }, [api]);
+  const fetchReviews = useCallback(async (id) => {
+    try {
+      const response = await api.get(`/review/${id}`);
       setItems(response.data.data);
       return response;
     } catch (err) {
@@ -153,6 +164,7 @@ export const ItemProvider = ({ children }) => {
         reviews,
         selectedItem,
         fetchItems,
+        fetchReviews,
         getItem,
         addItem,
         updateItem,

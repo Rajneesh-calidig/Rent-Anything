@@ -109,7 +109,7 @@ export default function RentItemCard() {
             </div>
 
             <button className="w-full py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-             <RazorpayButton item={item} amount={totalAmount * 100}/>
+             {/* <RazorpayButton item={item} amount={totalAmount * 100}/> */}
             </button>
           </div>
         </div>
