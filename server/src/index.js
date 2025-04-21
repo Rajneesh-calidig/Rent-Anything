@@ -17,7 +17,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(cookieParser());
 // app.use(cookies());
 const corsOptions = {
-    origin:'http://localhost:5173',
+    origin:'https://rent-anything-frontend.vercel.app/',
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials:true
 }
