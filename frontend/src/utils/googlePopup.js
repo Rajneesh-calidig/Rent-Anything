@@ -3,7 +3,7 @@ import { setSessionData } from "../services/session.service";
 export const openGooglePopup = () => {
     const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${
       import.meta.env.VITE_GOOGLE_CLIENT_ID
-    }&redirect_uri=http://localhost:4000/api/auth/google/callback&response_type=code&scope=openid%20email%20profile`;
+    }&redirect_uri=https://rent-anything.vercel.app/api/auth/google/callback&response_type=code&scope=openid%20email%20profile`;
   
     const width = 500;
     const height = 600;
@@ -17,7 +17,7 @@ export const openGooglePopup = () => {
     );
   
     const listener = (event) => {
-      if (event.origin !== 'http://localhost:4000') return;
+      if (event.origin !== 'https://rent-anything.vercel.app/') return;
       console.log(event)
       const { email,error } = event.data;
       if (email) {
