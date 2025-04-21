@@ -29,7 +29,7 @@ const RazorpayButton = ({item,amount }) => {
     setLoading(true);
 
     try {
-      const res = await fetch("https://rent-anything.vercel.app/api/payment/create-order", {
+      const res = await fetch("api/payment/create-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
