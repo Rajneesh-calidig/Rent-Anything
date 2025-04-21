@@ -10,6 +10,7 @@ import { toast } from "react-toastify"
 
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [keyword,setkeyword] = useState("")
   const [isScrolled, setIsScrolled] = useState(false)
   const location = useLocation();
   const { user, logout } = useAuth()
@@ -87,8 +88,17 @@ export const Header = () => {
           <div className="hidden md:block relative w-1/3">
             <input
               type="text"
+              value={keyword}
+              onChange={(e) => setkeyword(e.target.value)}
               placeholder="What are you looking for?"
               className="w-full py-2 pl-4 pr-10 rounded-full border border-[#D9D9D9] bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  navigate(`/search?keyword=${keyword}`)
+                }
+              }
+            }
             />
             <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors">
               <FontAwesomeIcon icon={faMagnifyingGlass} />

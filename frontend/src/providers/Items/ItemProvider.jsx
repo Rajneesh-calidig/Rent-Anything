@@ -1,7 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useInterceptor } from "../Interceptor/InterceptorProvider.jsx";
-import { searchItems } from "../../../../server/src/controllers/items.controller.js";
-import { createReview } from "../../../../server/src/controllers/review.controller.js";
 import { useAuth } from "../Auth/AuthProvider.jsx";
 
 const defaultItems = [];

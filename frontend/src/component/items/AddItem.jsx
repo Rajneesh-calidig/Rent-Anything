@@ -479,7 +479,7 @@ export default function AddItem() {
                 </p>
               </div> */}
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Security Deposit (₹)</label>
                 <div className="relative">
                   <input
@@ -498,7 +498,7 @@ export default function AddItem() {
                 <p className="mt-1 text-xs text-gray-500">
                   Suggested: ₹{formData.pricePerDay ? Math.round(formData.pricePerDay * 5) : 0}
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 

@@ -29,9 +29,6 @@ const itemSchema = new Schema({
     required: true,
     min: [0, 'Price cannot be negative'],
   },
-  securityDeposit: {
-    type: Number,
-  },
   condition:{
     type:String,
     enum: ['Like New','Good','Brand New','Excellent','Fair','Acceptable'],
