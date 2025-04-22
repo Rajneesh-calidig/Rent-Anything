@@ -40,16 +40,15 @@ export const Header = () => {
   }, []);
 
   const handleLogout = async (e) => {
-    // e.preventDefault();
-    // try {
-    //   const response = await logout();
-    //   toast.success("Logged out successfully!");
-    // } catch (err) {
-    //   console.error(err);
-    // }
-    // clearSessionData();
-    // navigate(routes.landing);
-    alert("loggin out automatically");
+    e.preventDefault();
+    try {
+      const response = await logout();
+      toast.success("Logged out successfully!");
+    } catch (err) {
+      console.error(err);
+    }
+    clearSessionData();
+    navigate(routes.landing);
   };
 
   return (
