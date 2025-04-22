@@ -20,14 +20,15 @@ export const openGooglePopup = () => {
   );
 
   const listener = (event) => {
-    if (event.origin !== `${import.meta.env.VITE_FILE_URL}`) return;
     console.log(event);
+    if (event.origin !== `${import.meta.env.VITE_FILE_URL}`) return;
     const { email, error } = event.data;
     if (email) {
       // localStorage.setItem('token', token);
+      console.log(email);
       popup?.close();
-      setSessionData("email", email);
-      window.location.reload();
+      // setSessionData("email", email);
+      // window.location.reload();
       // Optional: trigger login state change or redirect
     } else if (error) {
       console.error("Login failed:", error);
