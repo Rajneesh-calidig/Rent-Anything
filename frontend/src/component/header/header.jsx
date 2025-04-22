@@ -1,48 +1,56 @@
-import { useEffect, useState } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faTimes, faBars, faMagnifyingGlass, faUser, faHeart, faShoppingCart } from "@fortawesome/free-solid-svg-icons"
-import Logo from "../../assets/img/logo.png"
-import { clearSessionData } from "../../services/session.service"
-import { routes } from "../../routes/routes"
-import { useAuth } from "../../providers/Auth/AuthProvider"
-import { toast } from "react-toastify"
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faTimes,
+  faBars,
+  faMagnifyingGlass,
+  faUser,
+  faHeart,
+  faShoppingCart,
+} from "@fortawesome/free-solid-svg-icons";
+import Logo from "../../assets/img/logo.png";
+import { clearSessionData } from "../../services/session.service";
+import { routes } from "../../routes/routes";
+import { useAuth } from "../../providers/Auth/AuthProvider";
+import { toast } from "react-toastify";
 
 export const Header = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [keyword,setkeyword] = useState("")
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [keyword, setkeyword] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   // Add scroll effect
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
-        setIsScrolled(true)
+        setIsScrolled(true);
       } else {
-        setIsScrolled(false)
+        setIsScrolled(false);
       }
-    }
+    };
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [])
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const handleLogout = async (e) => {
-    e.preventDefault()
-    try {
-      const response = await logout()
-      toast.success("Logged out successfully!")
-    } catch (err) {
-      console.error(err)
-    }
-    clearSessionData()
-    navigate(routes.landing)
-  }
+    // e.preventDefault();
+    // try {
+    //   const response = await logout();
+    //   toast.success("Logged out successfully!");
+    // } catch (err) {
+    //   console.error(err);
+    // }
+    // clearSessionData();
+    // navigate(routes.landing);
+    alert("loggin out automatically");
+  };
 
   return (
     <header
@@ -55,7 +63,11 @@ export const Header = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <img src={Logo || "/placeholder.svg"} alt="Rent Anything" className="h-10 w-auto mr-2" />
+              <img
+                src={Logo || "/placeholder.svg"}
+                alt="Rent Anything"
+                className="h-10 w-auto mr-2"
+              />
               {/* <span className="font-bold text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent hidden sm:inline-block">
                 RentAnything
               </span> */}
@@ -94,11 +106,10 @@ export const Header = () => {
               className="w-full py-2 pl-4 pr-10 rounded-full border border-[#D9D9D9] bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  e.preventDefault()
-                  navigate(`/search?keyword=${keyword}`)
+                  e.preventDefault();
+                  navigate(`/search?keyword=${keyword}`);
                 }
-              }
-            }
+              }}
             />
             <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors">
               <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -109,9 +120,9 @@ export const Header = () => {
           <div className="flex items-center space-x-2">
             {/* Wishlist and Cart - visible on all screen sizes */}
             {user?.email && (
-            <button className="p-2 text-gray-600 hover:text-indigo-600 rounded-full hover:bg-gray-100 transition-all">
-              <FontAwesomeIcon icon={faHeart} size="lg" />
-            </button>
+              <button className="p-2 text-gray-600 hover:text-indigo-600 rounded-full hover:bg-gray-100 transition-all">
+                <FontAwesomeIcon icon={faHeart} size="lg" />
+              </button>
             )}
             {/* <button className="p-2 text-gray-600 hover:text-indigo-600 rounded-full hover:bg-gray-100 transition-all">
               <FontAwesomeIcon icon={faShoppingCart} />
@@ -123,7 +134,9 @@ export const Header = () => {
                 <div className="relative group">
                   <button className="flex items-center justify-center gap-3 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:bg-gray-100 transition-all">
                     <FontAwesomeIcon icon={faUser} className="" />
-                    <span className="hidden md:inline-block font-medium">{user.email.split("@")[0]}</span>
+                    <span className="hidden md:inline-block font-medium">
+                      {user.email.split("@")[0]}
+                    </span>
                   </button>
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 invisible group-hover:visible transition-all opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0">
                     <Link
@@ -161,7 +174,10 @@ export const Header = () => {
               </div>
             ) : (
               <div className="hidden sm:flex items-center space-x-3">
-                <Link to="/signin" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">
+                <Link
+                  to="/signin"
+                  className="text-gray-700 hover:text-indigo-600 font-medium transition-colors"
+                >
                   Sign In
                 </Link>
                 <Link
@@ -178,14 +194,21 @@ export const Header = () => {
               onClick={() => setIsOpen(!isOpen)}
               className="lg:hidden p-2 rounded-md text-gray-700 hover:text-indigo-600 hover:bg-gray-100 focus:outline-none transition-colors"
             >
-              <FontAwesomeIcon icon={isOpen ? faTimes : faBars} className="w-6 h-6" />
+              <FontAwesomeIcon
+                icon={isOpen ? faTimes : faBars}
+                className="w-6 h-6"
+              />
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <div className={`lg:hidden transition-all duration-300 overflow-hidden ${isOpen ? "max-h-screen" : "max-h-0"}`}>
+      <div
+        className={`lg:hidden transition-all duration-300 overflow-hidden ${
+          isOpen ? "max-h-screen" : "max-h-0"
+        }`}
+      >
         <div className="bg-white shadow-lg rounded-b-lg mx-4 mt-2">
           {/* Mobile Search */}
           <div className="p-4 border-b border-gray-100">
@@ -278,5 +301,5 @@ export const Header = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
