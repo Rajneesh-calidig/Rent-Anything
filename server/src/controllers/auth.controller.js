@@ -144,7 +144,13 @@ export async function login(req, res) {
 
 export async function logout(req, res) {
   try {
-    res.clearCookie("jwt-user");
+    console.log("incoming cookies, => ", req.cookies);
+    res.clearCookie("jwt-user", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+      domain: "rent-anything.vercel.app",
+    });
     res
       .status(httpStatus.SUCCESS)
       .json({ success: true, message: "Logged out successfully" });

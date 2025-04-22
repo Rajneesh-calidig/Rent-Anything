@@ -4,6 +4,7 @@ import User from "../models/User.js";
 export const protectRoute = async (req, res, next) => {
   try {
     const token = req.cookies["jwt-user"];
+    console.log("cookie token -> ", token);
 
     if (!token) {
       return res
@@ -13,11 +14,13 @@ export const protectRoute = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // console.log(decoded);
-    if(decoded){
-      const user = await User.findById(decoded.userId)
-      if(user?.status === "INACTIVE"){
+    if (decoded) {
+      const user = await User.findById(decoded.userId);
+      if (user?.status === "INACTIVE") {
         res.clearCookie("jwt-user");
-        return res.status(401).json({success:false,message:"Unauthorized user"})
+        return res
+          .status(401)
+          .json({ success: false, message: "Unauthorized user" });
       }
     }
 
