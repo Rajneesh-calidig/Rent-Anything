@@ -1,41 +1,47 @@
 // const express=require("express")
 // const connectDB=require("../config/db")
-import express from 'express'
-import connectDB from './config/db.js'
-import routes from './routes/index.js'
-import cors from 'cors'
+import express from "express";
+import connectDB from "./config/db.js";
+import routes from "./routes/index.js";
+import cors from "cors";
 import cookieParser from "cookie-parser";
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from "path";
+import { fileURLToPath } from "url";
 
-const app=express()
+const app = express();
 
-connectDB()
+connectDB();
 
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 // app.use(cookies());
 const corsOptions = {
-    origin:'http://localhost:5173',
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials:true
-}
+  origin: [
+    "http://localhost:5173",
+    "https://rent-anything-frontend.vercel.app",
+  ],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+};
 app.use(cors(corsOptions));
 
-const __filename = fileURLToPath(import.meta.url)
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
- 
-app.use('/public/images',express.static(path.join(__dirname,'public/images')))
 
-app.get("/test",(req,res)=>{
-    res.status(200).json({
-        "success":true,
-        "message":"connect with server"
-    })
-})
+app.use(
+  "/public/images",
+  express.static(path.join(__dirname, "public/images"))
+);
 
-app.use("/api",routes)
+app.get("/test", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "connect with server",
+  });
+});
+
+app.use("/api", routes);
 
 // app.use((err, req, res, next) => {
 //     console.error(err.stack);
@@ -45,6 +51,6 @@ app.use("/api",routes)
 //     });
 // });
 
-app.listen(4000,()=>{
-    console.log("server is running at port 4000")
-})
+app.listen(4000, () => {
+  console.log("server is running at port 4000");
+});
