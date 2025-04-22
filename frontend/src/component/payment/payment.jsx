@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getSessionData } from "../../services/session.service";
 
 const razorpayKey = import.meta.env.VITE_key_id;
-const RazorpayButton = ({item,amount }) => {
+const RazorpayButton = ({ item, amount }) => {
   const [loading, setLoading] = useState(false);
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -14,9 +14,8 @@ const RazorpayButton = ({item,amount }) => {
     });
   };
 
-  const userEmail=getSessionData("email")
-  const userName=getSessionData("name")
-
+  const userEmail = getSessionData("email");
+  const userName = getSessionData("name");
 
   const payNow = async () => {
     const isScriptLoaded = await loadRazorpayScript();
@@ -29,18 +28,21 @@ const RazorpayButton = ({item,amount }) => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:4000/api/payment/create-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: Number(amount)*100, // in paisa
-          itemData: item,
-        }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/payment/create-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: Number(amount) * 100, // in paisa
+            itemData: item,
+          }),
+        }
+      );
       const data = await res.json();
-console.log("our data is",data)
+      console.log("our data is", data);
       const options = {
         key: razorpayKey, // Replace with your Razorpay key
         amount: data.amount,
@@ -48,25 +50,28 @@ console.log("our data is",data)
         name: "My App",
         description: "Test Payment",
         order_id: data.id,
-        handler: async function  (response) {
+        handler: async function (response) {
           console.log("Payment Success:", response);
           // Send response to backend for verification
           try {
-            const verifyRes = await fetch("http://localhost:4000/api/payment/verify-payment", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
-            });
-        
+            const verifyRes = await fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/payment/verify-payment`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
+              }
+            );
+
             const result = await verifyRes.json();
             console.log("Verification result:", result);
-            
+
             if (result.success) {
               alert("Payment Verified Successfully!");
             } else {
