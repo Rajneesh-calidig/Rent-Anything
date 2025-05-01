@@ -1,12 +1,14 @@
 import { Header } from "../header/header";
 import { Footer } from "../footer/footer";
+import { useLocation } from "react-router-dom";
 export const Layout = ({ children }) => {
+  const location = useLocation();
   return (
     <>
       <div>
-        <Header></Header>
+        {location.pathname !== "/google/callback" && <Header></Header>}
         <div className="min-h-dvh">{children}</div>
-        <Footer></Footer>
+        {location.pathname !== "/google/callback" && <Footer></Footer>}
       </div>
     </>
   );
