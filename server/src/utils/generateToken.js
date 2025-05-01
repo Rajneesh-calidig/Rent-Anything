@@ -4,11 +4,16 @@ export const generateTokenAndSetCookie = (userId, res, rememberMe = true) => {
   const expiresIn = rememberMe ? "30d" : "3h";
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn });
 
+  // const cookieOptions = {
+  //   httpOnly: true,
+  //   sameSite: "none",
+  //   secure: true,
+  //   domain: "rent-anything.vercel.app",
+  // };
   const cookieOptions = {
     httpOnly: true,
-    sameSite: "none",
-    secure: true,
-    domain: "rent-anything.vercel.app",
+    sameSite: "strict",
+    secure: false,
   };
 
   if (rememberMe) {

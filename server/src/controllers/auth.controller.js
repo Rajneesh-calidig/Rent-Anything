@@ -106,7 +106,7 @@ export async function login(req, res) {
       user = await findUserByEmail(emailOrNumber);
     }
 
-    if (user.status === "INACTIVE") {
+    if (user?.status === "INACTIVE") {
       return res
         .status(httpStatus.UNAUTHORIZED)
         .json({ success: false, message: "Account is deactivated" });
@@ -144,13 +144,15 @@ export async function login(req, res) {
 
 export async function logout(req, res) {
   try {
-    console.log("incoming cookies, => ", req.cookies);
-    res.clearCookie("jwt-user", {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-      domain: "rent-anything.vercel.app",
-    });
+    // console.log("incoming cookies, => ", req.cookies);
+    // res.clearCookie("jwt-user", {
+    //   httpOnly: true,
+    //   sameSite: "none",
+    //   secure: true,
+    //   domain: "rent-anything.vercel.app",
+    // });
+
+    res.clearCookie("jwt-user");
     res
       .status(httpStatus.SUCCESS)
       .json({ success: true, message: "Logged out successfully" });
@@ -198,16 +200,20 @@ const getGoogleUser = async (access_token) => {
       },
     }
   );
+  console.log(data);
   return data;
 };
 
 export async function googleCallback(req, res) {
   const code = req.query.code;
   try {
+    console.log("this is running");
     const { access_token, id_token } = await getGoogleTokens(code);
     const googleUser = await getGoogleUser(access_token);
+    console.log(googleUser);
 
     const user = await findUserByEmail(googleUser.email);
+    console.log(user);
     let token;
     if (!user) {
       const newUser = await User.create({
@@ -221,23 +227,10 @@ export async function googleCallback(req, res) {
     } else {
       token = generateTokenAndSetCookie(user._id, res);
     }
-
     console.log(token);
-
-    // Redirect or send token
-    res.send(`
-      <script>
-        window.opener.postMessage({ email: "${googleUser.email}" }, "https://rent-anything-frontend.vercel.app/search");
-        window.close();
-      </script>
-    `);
+    res.json({ token, googleUser, user });
   } catch (err) {
     console.error(err);
-    res.send(`
-      <script>
-        window.opener.postMessage({ error: "Authentication failed" }, "https://rent-anything-frontend.vercel.app");
-        window.close();
-      </script>
-    `);
+    res.status(500).json({ error: "Authentication Failed!" });
   }
 }

@@ -17,116 +17,30 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../../providers/Auth/AuthProvider";
 import { toast } from "react-toastify";
 import { differenceInMinutes } from "date-fns";
-import { formatTime } from "../../utils/date-utils";
+import { formatTime, formatDate } from "../../utils/date-utils";
 import RazorpayButton from "../payment/payment";
+import { useLoader } from "../../providers/Loader/LoaderProvider";
 
 export default function BookItem() {
   const { getItem } = useItem();
   const { id } = useParams();
   const { user } = useAuth();
   // const { navigate } = useNavigate();
-  const [product, setProduct] = useState({
-    id: "1",
-    title: "Professional DSLR Camera with 3 Lenses",
-    description:
-      "High-quality DSLR camera perfect for photography enthusiasts and professionals. Comes with three premium lenses for various photography needs. The package includes a standard zoom lens, a wide-angle lens, and a telephoto lens. Also includes a camera bag, tripod, and extra battery.",
-    pricePerDay: 1200,
-    pricePerWeek: 7000,
-    pricePerMonth: 25000,
-    category: "Electronics",
-    subcategory: "Cameras",
-    brand: "Canon",
-    model: "EOS 5D Mark IV",
-    condition: "Excellent",
-    location: "Mumbai, Maharashtra",
-    owner: {
-      name: "Rahul Sharma",
-      rating: 4.9,
-      responseTime: "Within 1 hour",
-      memberSince: "June 2022",
-      verified: true,
-      image: "/placeholder.svg?height=100&width=100",
-    },
-    rating: 4.8,
-    reviews: [
-      {
-        id: 1,
-        user: "Priya M.",
-        date: "2 weeks ago",
-        rating: 5,
-        comment:
-          "Amazing camera! The picture quality is outstanding and the owner was very helpful in explaining how to use all the features. Highly recommend!",
-        userImage: "/placeholder.svg?height=50&width=50",
-      },
-      {
-        id: 2,
-        user: "Vikram S.",
-        date: "1 month ago",
-        rating: 5,
-        comment:
-          "Great experience renting this camera. It was in perfect condition and the lenses were exactly what I needed for my photography project.",
-        userImage: "/placeholder.svg?height=50&width=50",
-      },
-      {
-        id: 3,
-        user: "Ananya K.",
-        date: "2 months ago",
-        rating: 4,
-        comment:
-          "Very good camera and accessories. The owner was responsive and helpful. Would rent again for sure.",
-        userImage: "/placeholder.svg?height=50&width=50",
-      },
-    ],
-    features: [
-      "30.4 Megapixel Full-Frame CMOS Sensor",
-      "4K Video Recording",
-      "61-Point AF System",
-      "ISO Range of 100-32000",
-      "7 fps Continuous Shooting",
-      '3.2" Touchscreen LCD',
-    ],
-    images: [
-      "/placeholder.svg?height=600&width=800",
-      "/placeholder.svg?height=600&width=800&text=Lens+Kit",
-      "/placeholder.svg?height=600&width=800&text=Side+View",
-      "/placeholder.svg?height=600&width=800&text=Back+View",
-      "/placeholder.svg?height=600&width=800&text=With+Accessories",
-    ],
-    availability: {
-      available: true,
-      nextAvailable: "Immediately",
-      booked: ["2023-05-15", "2023-05-16", "2023-05-17"],
-    },
-    relatedItems: [
-      {
-        id: "2",
-        title: "Portable Studio Lighting Kit",
-        pricePerDay: 800,
-        rating: 4.6,
-        image: "/placeholder.svg?height=200&width=300&text=Lighting+Kit",
-      },
-      {
-        id: "3",
-        title: "Professional Tripod",
-        pricePerDay: 300,
-        rating: 4.7,
-        image: "/placeholder.svg?height=200&width=300&text=Tripod",
-      },
-      {
-        id: "4",
-        title: "Camera Stabilizer",
-        pricePerDay: 500,
-        rating: 4.5,
-        image: "/placeholder.svg?height=200&width=300&text=Stabilizer",
-      },
-    ],
-  });
+  const [product, setProduct] = useState();
+  const loader = useLoader();
 
   useEffect(() => {
     const fetchItem = async () => {
-      const item = await getItem(id);
-      console.log(item);
-      setProduct(item);
+      try {
+        loader.start();
+        const item = await getItem(id);
+        console.log(item);
+        setProduct(item);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        loader.stop();
+      }
     };
     fetchItem();
   }, [getItem]);
@@ -141,7 +55,7 @@ export default function BookItem() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [totalPrice, setTotalPrice] = useState(product.pricePerDay);
+  const [totalPrice, setTotalPrice] = useState(product?.pricePerDay);
   const [isFavorite, setIsFavorite] = useState(true);
   const [reviewDetails, setReviewDetails] = useState({
     rating: 0,
@@ -157,11 +71,11 @@ export default function BookItem() {
     const days = calculateDays(startDate, endDate);
 
     if (rentalPeriod === "day") {
-      basePrice = product.pricePerDay * (days || 1);
+      basePrice = product?.pricePerDay * (days || 1);
     } else if (rentalPeriod === "week") {
-      basePrice = product.pricePerWeek * (Math.ceil(days / 7) || 1);
+      basePrice = product?.pricePerWeek * (Math.ceil(days / 7) || 1);
     } else if (rentalPeriod === "month") {
-      basePrice = product.pricePerMonth * (Math.ceil(days / 30) || 1);
+      basePrice = product?.pricePerMonth * (Math.ceil(days / 30) || 1);
     }
 
     setTotalPrice(basePrice * quantity);
@@ -180,13 +94,13 @@ export default function BookItem() {
   // Image gallery navigation
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) =>
-      prevIndex === product.images.length - 1 ? 0 : prevIndex + 1
+      prevIndex === product?.images.length - 1 ? 0 : prevIndex + 1
     );
   };
 
   const prevImage = () => {
     setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
+      prevIndex === 0 ? product?.images.length - 1 : prevIndex - 1
     );
   };
 
@@ -255,7 +169,7 @@ export default function BookItem() {
 
   useEffect(() => {
     const fetchReviews = async () => {
-      const reviews = await getReviews(product._id);
+      const reviews = await getReviews(product?._id);
       const updatedReviews = reviews.map((review) => {
         const timeDifference = differenceInMinutes(
           new Date(),
@@ -269,7 +183,7 @@ export default function BookItem() {
       setReviews(updatedReviews);
       // console.log(reviews)
     };
-    if (product._id) {
+    if (product?._id) {
       fetchReviews();
     }
   }, [getReviews, product]);
@@ -278,7 +192,7 @@ export default function BookItem() {
     try {
       const response = await createReview({
         ...reviewDetails,
-        itemId: product._id,
+        itemId: product?._id,
       });
       console.log("submit ->< ", response);
       if (response.status === 200) {
@@ -319,10 +233,10 @@ export default function BookItem() {
               <img
                 src={
                   `${import.meta.env.VITE_FILE_URL}${
-                    product.images[currentImageIndex]
+                    product?.images[currentImageIndex]
                   }` || "/placeholder.svg"
                 }
-                alt={product.title}
+                alt={product?.title}
                 className={`w-full h-full object-contain transition-transform duration-200 ${
                   isZoomed ? "scale-150" : ""
                 }`}
@@ -359,13 +273,13 @@ export default function BookItem() {
 
               {/* Image counter */}
               <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
-                {currentImageIndex + 1} / {product.images.length}
+                {currentImageIndex + 1} / {product?.images?.length}
               </div>
             </div>
 
             {/* Thumbnails */}
             <div className="flex p-4 space-x-2 overflow-x-auto">
-              {product.images.map((image, index) => (
+              {product?.images?.map((image, index) => (
                 <div
                   key={index}
                   className={`w-20 h-20 flex-shrink-0 cursor-pointer rounded-md overflow-hidden border-2 ${
@@ -394,24 +308,24 @@ export default function BookItem() {
               <div>
                 <div className="flex items-center text-sm text-gray-500 mb-2">
                   <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium mr-2">
-                    {product.category}
+                    {product?.category}
                   </span>
-                  <span>{product.subcategory}</span>
+                  <span>{product?.subcategory}</span>
                   <span className="mx-2">•</span>
-                  <span>{product.brand}</span>
+                  <span>{product?.brand}</span>
                 </div>
                 <div className="flex items-center">
                   <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                    {product.title}
+                    {product?.title}
                   </h1>
                   <span className="mx-2 text-gray-300">|</span>
                   <div className="flex items-center text-sm text-gray-500">
                     <MapPin size={14} className="mr-1" />
-                    {product.location}
+                    {product?.location}
                   </div>
                 </div>
                 <div className="flex items-center mb-4">
-                  <StarRating rating={product.avgRating} size={18} />
+                  <StarRating rating={product?.avgRating} size={18} />
                   {/* <span className="mx-2 text-gray-300">|</span> */}
                   <span className="text-sm ml-3 text-gray-500">{`${
                     product?.totalReviews
@@ -440,7 +354,7 @@ export default function BookItem() {
 
             <div className="border-t border-gray-100 my-6 pt-6">
               <h2 className="text-lg font-semibold mb-4">Description</h2>
-              <p className="text-gray-600 mb-6">{product.description}</p>
+              <p className="text-gray-600 mb-6">{product?.description}</p>
 
               {/* <h3 className="text-md font-semibold mb-3">Features & Specifications</h3>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6">
@@ -455,15 +369,15 @@ export default function BookItem() {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <div className="text-xs text-gray-500 mb-1">Brand</div>
-                  <div className="font-medium">{product.brand}</div>
+                  <div className="font-medium">{product?.brand}</div>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <div className="text-xs text-gray-500 mb-1">Model</div>
-                  <div className="font-medium">{product.model}</div>
+                  <div className="font-medium">{product?.model}</div>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <div className="text-xs text-gray-500 mb-1">Condition</div>
-                  <div className="font-medium">{product.condition}</div>
+                  <div className="font-medium">{product?.condition}</div>
                 </div>
               </div>
             </div>
@@ -474,8 +388,9 @@ export default function BookItem() {
               <div className="flex items-start">
                 <img
                   src={
-                    `${import.meta.env.VITE_FILE_URL}${user?.profileImage}` ||
-                    "/placeholder.svg"
+                    `${import.meta.env.VITE_FILE_URL}${
+                      product?.ownerId?.profileImage
+                    }` || "/placeholder.svg"
                   }
                   alt={product?.owner?.name}
                   className="w-16 h-16 rounded-full object-cover mr-4"
@@ -494,7 +409,7 @@ export default function BookItem() {
                     <StarRating rating={product?.owner?.rating} />
                     <span className="mx-2 text-gray-300">|</span>
                     <span className="text-sm text-gray-500">
-                      Member since {product?.owner?.memberSince}
+                      Member since: {formatDate(product?.ownerId?.createdAt)}
                     </span>
                   </div>
                   <div className="flex items-center mt-2 text-sm text-gray-600">
@@ -577,7 +492,7 @@ export default function BookItem() {
                 <div className="flex-1">
                   <div className="flex items-center mb-4">
                     <div className="text-4xl font-bold mr-3">
-                      {product.rating}
+                      {product?.rating}
                     </div>
                     {/* <div>
                       <StarRating rating={product.rating} size={20} />
@@ -672,7 +587,7 @@ export default function BookItem() {
             <div className="flex justify-between items-center mb-4">
               <div>
                 <span className="text-2xl font-bold text-gray-800">
-                  ₹{product.pricePerDay}
+                  ₹{product?.pricePerDay}
                 </span>
                 <span className="text-gray-500">/day</span>
               </div>
@@ -777,7 +692,7 @@ export default function BookItem() {
               <div className="space-y-2 mb-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Rental fee</span>
-                  <span>₹{totalPrice.toLocaleString()}</span>
+                  <span>₹{totalPrice?.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Service fee</span>

@@ -61,7 +61,7 @@
 // //           endDate: searchParams.get("endDate") || null,
 // //           category: searchParams.getAll("category") || [],
 // //         };
-      
+
 // //         setFilters(newFilters);
 // //         setSelectedCategories(newFilters.category);
 // //         await searchItems(newFilters);
@@ -796,22 +796,23 @@
 //   )
 // }
 
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { Search, Star, X, ChevronDown, ChevronUp } from "lucide-react"
-import { useNavigate, useSearchParams } from "react-router-dom"
-import { useItem } from "../../providers/Items/ItemProvider"
-import { MapPin, Tag, Calendar } from "lucide-react"
+import { useState, useEffect, useCallback } from "react";
+import { Search, Star, X, ChevronDown, ChevronUp } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useItem } from "../../providers/Items/ItemProvider";
+import { MapPin, Tag, Calendar } from "lucide-react";
+import { useLoader } from "../../providers/Loader/LoaderProvider";
 
 export default function BrowseItems() {
-  const { items, searchItems } = useItem()
-  const [searchParams, setSearchParams] = useSearchParams({})
-  const [filters, setFilters] = useState(searchParams)
-  const [selectedCategories, setSelectedCategories] = useState([])
-  const [activeSort, setActiveSort] = useState("")
-  const [includeUnavailableItems, setIncludeUnavailableItems] = useState(false)
-  const navigate = useNavigate()
+  const { items, searchItems } = useItem();
+  const [searchParams, setSearchParams] = useSearchParams({});
+  const [filters, setFilters] = useState(searchParams);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [activeSort, setActiveSort] = useState("");
+  const [includeUnavailableItems, setIncludeUnavailableItems] = useState(false);
+  const navigate = useNavigate();
 
   // Collapsible filter sections
   const [expandedSections, setExpandedSections] = useState({
@@ -820,93 +821,106 @@ export default function BrowseItems() {
     totalPrice: true,
     category: true,
     dates: true,
-  })
+  });
 
-  const categories = ["All", "Electronics", "Furniture", "Clothing", "Sports", "Tools", "Vehicles"]
+  const categories = [
+    "All",
+    "Electronics",
+    "Furniture",
+    "Clothing",
+    "Sports",
+    "Tools",
+    "Vehicles",
+  ];
 
   const toggleSection = (section) => {
     setExpandedSections({
       ...expandedSections,
       [section]: !expandedSections[section],
-    })
-  }
+    });
+  };
 
   const handleFilterChange = (e) => {
-    const { name, value } = e.target
-    const newFilters = { ...filters, [name]: value }
-    setFilters(newFilters)
+    const { name, value } = e.target;
+    const newFilters = { ...filters, [name]: value };
+    setFilters(newFilters);
 
     // Only add parameters that have values
-    const params = { ...Object.fromEntries(searchParams) }
+    const params = { ...Object.fromEntries(searchParams) };
     if (value) {
-      params[name] = value
+      params[name] = value;
     } else {
-      delete params[name]
+      delete params[name];
     }
-    setSearchParams(params)
-  }
+    setSearchParams(params);
+  };
 
   const handleSliderChange = (e) => {
-    const { name, value } = e.target
-    const numValue = Number.parseInt(value)
-    const newFilters = { ...filters, [name]: numValue }
-    setFilters(newFilters)
+    const { name, value } = e.target;
+    const numValue = Number.parseInt(value);
+    const newFilters = { ...filters, [name]: numValue };
+    setFilters(newFilters);
 
     // Only add parameters that differ from defaults
-    const params = { ...Object.fromEntries(searchParams) }
-    if ((name === "minPrice" && numValue > 0) || (name === "maxPrice" && numValue !== 5000)) {
-      params[name] = numValue
+    const params = { ...Object.fromEntries(searchParams) };
+    if (
+      (name === "minPrice" && numValue > 0) ||
+      (name === "maxPrice" && numValue !== 5000)
+    ) {
+      params[name] = numValue;
     } else {
-      delete params[name]
+      delete params[name];
     }
-    setSearchParams(params)
-  }
+    setSearchParams(params);
+  };
 
   const handleCategoryToggle = (category) => {
-    let newCategories = []
+    let newCategories = [];
 
     if (selectedCategories.includes(category)) {
-      newCategories = selectedCategories.filter((c) => c !== category)
+      newCategories = selectedCategories.filter((c) => c !== category);
     } else {
-      newCategories = [...selectedCategories, category]
+      newCategories = [...selectedCategories, category];
     }
 
-    setSelectedCategories(newCategories)
-    setFilters({ ...filters, category: newCategories })
+    setSelectedCategories(newCategories);
+    setFilters({ ...filters, category: newCategories });
 
     // Update URL params with only selected categories
-    const params = { ...Object.fromEntries(searchParams) }
+    const params = { ...Object.fromEntries(searchParams) };
 
     // Remove existing category params
-    delete params.category
+    delete params.category;
 
     // Add new category params if there are any
     if (newCategories.length > 0) {
-      params.category = newCategories
+      params.category = newCategories;
     }
 
-    setSearchParams(params)
-  }
+    setSearchParams(params);
+  };
 
   const handleSortChange = (sortOption) => {
-    setActiveSort(sortOption)
-    setFilters({ ...filters, sortBy: sortOption })
+    setActiveSort(sortOption);
+    setFilters({ ...filters, sortBy: sortOption });
 
-    const params = { ...Object.fromEntries(searchParams) }
+    const params = { ...Object.fromEntries(searchParams) };
 
     // Only add sort parameter if it has a value
     if (sortOption) {
-      params.sortBy = sortOption
+      params.sortBy = sortOption;
     } else {
-      delete params.sortBy
+      delete params.sortBy;
     }
 
-    setSearchParams(params)
-  }
+    setSearchParams(params);
+  };
+  const loader = useLoader();
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
+        loader.start();
         const newFilters = {
           keyword: searchParams.get("keyword") || "",
           location: searchParams.get("location") || "",
@@ -917,18 +931,21 @@ export default function BrowseItems() {
           startDate: searchParams.get("startDate") || "",
           endDate: searchParams.get("endDate") || "",
           category: searchParams.getAll("category") || [],
-          includeUnavailableItems: searchParams.get("includeUnavailableItems") || false,
-        }
+          includeUnavailableItems:
+            searchParams.get("includeUnavailableItems") || false,
+        };
 
-        setFilters(newFilters)
-        setSelectedCategories(newFilters.category)
-        await searchItems(newFilters)
+        setFilters(newFilters);
+        setSelectedCategories(newFilters.category);
+        await searchItems(newFilters);
       } catch (err) {
-        console.log(err)
+        console.log(err);
+      } finally {
+        loader.stop();
       }
-    }
-    fetchItems()
-  }, [searchParams])
+    };
+    fetchItems();
+  }, [searchParams]);
 
   const clearFilters = () => {
     setFilters({
@@ -943,16 +960,18 @@ export default function BrowseItems() {
       endDate: "",
       distance: 50,
       includeUnavailableItems: false,
-    })
-    setSelectedCategories([])
-    setActiveSort("")
-    setSearchParams({})
-  }
+    });
+    setSelectedCategories([]);
+    setActiveSort("");
+    setSearchParams({});
+  };
 
   const CustomDatePicker = ({ label, name, value, onChange, min, max }) => {
     return (
       <div className="relative">
-        <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+        </label>
         <div className="relative">
           <input
             name={name}
@@ -966,8 +985,8 @@ export default function BrowseItems() {
           <Calendar className="absolute left-2 top-2.5 h-5 w-5 text-gray-400" />
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   // Custom slider component
   const CustomSlider = ({ min, max, value, onChange, label, name }) => {
@@ -990,8 +1009,8 @@ export default function BrowseItems() {
           <span>₹{max}</span>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   // Custom rating component
   const RatingStars = ({ rating }) => {
@@ -1001,45 +1020,52 @@ export default function BrowseItems() {
           <Star
             key={i}
             size={16}
-            className={i < Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}
+            className={
+              i < Math.floor(rating)
+                ? "text-yellow-400 fill-yellow-400"
+                : "text-gray-300"
+            }
           />
         ))}
         <span className="ml-1 text-sm text-gray-600">{rating}</span>
       </div>
-    )
-  }
+    );
+  };
 
   // Filter section component
   const FilterSection = useCallback(
     ({ title, isExpanded, onToggle, children }) => {
       return (
         <div className="border-b pb-4 mb-4">
-          <div className="flex justify-between items-center cursor-pointer mb-2" onClick={onToggle}>
+          <div
+            className="flex justify-between items-center cursor-pointer mb-2"
+            onClick={onToggle}
+          >
             <h3 className="font-semibold text-gray-800">{title}</h3>
             {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </div>
           {isExpanded && children}
         </div>
-      )
+      );
     },
-    [expandedSections],
-  )
+    [expandedSections]
+  );
 
   const handleUnavailbilityToggle = (checked) => {
-    const newValue = !checked
-    setIncludeUnavailableItems(newValue)
+    const newValue = !checked;
+    setIncludeUnavailableItems(newValue);
 
-    const params = { ...Object.fromEntries(searchParams) }
+    const params = { ...Object.fromEntries(searchParams) };
 
     // Only add parameter if true
     if (newValue) {
-      params.includeUnavailableItems = newValue
+      params.includeUnavailableItems = newValue;
     } else {
-      delete params.includeUnavailableItems
+      delete params.includeUnavailableItems;
     }
 
-    setSearchParams(params)
-  }
+    setSearchParams(params);
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 bg-gray-50 min-h-screen pt-24">
@@ -1096,7 +1122,11 @@ export default function BrowseItems() {
                   />
                 </div>
                 <div className="mt-4">
-                  <input type="checkbox" id="includeSecurity" className=" mr-2" />
+                  <input
+                    type="checkbox"
+                    id="includeSecurity"
+                    className=" mr-2"
+                  />
                   <label htmlFor="includeSecurity" className="text-sm">
                     Include security deposit in the price range.
                   </label>
@@ -1110,7 +1140,10 @@ export default function BrowseItems() {
               >
                 <div className="space-y-2">
                   {categories.map((category) => (
-                    <label key={category} className="flex items-center space-x-2">
+                    <label
+                      key={category}
+                      className="flex items-center space-x-2"
+                    >
                       <input
                         type="checkbox"
                         checked={selectedCategories.includes(category)}
@@ -1123,10 +1156,16 @@ export default function BrowseItems() {
                 </div>
               </FilterSection>
 
-              <FilterSection title="Dates" isExpanded={expandedSections.dates} onToggle={() => toggleSection("dates")}>
+              <FilterSection
+                title="Dates"
+                isExpanded={expandedSections.dates}
+                onToggle={() => toggleSection("dates")}
+              >
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Start Date
+                    </label>
                     <input
                       type="date"
                       name="startDate"
@@ -1136,7 +1175,9 @@ export default function BrowseItems() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      End Date
+                    </label>
                     <input
                       type="date"
                       name="endDate"
@@ -1153,7 +1194,9 @@ export default function BrowseItems() {
                     className=" mr-2"
                     name="includeUnavailableItems"
                     checked={includeUnavailableItems}
-                    onChange={() => handleUnavailbilityToggle(includeUnavailableItems)}
+                    onChange={() =>
+                      handleUnavailbilityToggle(includeUnavailableItems)
+                    }
                   />
                   <label htmlFor="includeUnavailable" className="text-sm">
                     Show unavailable items in the selected date range.
@@ -1209,21 +1252,30 @@ export default function BrowseItems() {
                   >
                     <div className="relative h-48 overflow-hidden">
                       <img
-                        src={`${import.meta.env.VITE_FILE_URL}${item.images[0]}` || "/placeholder.svg"}
+                        src={
+                          `${import.meta.env.VITE_FILE_URL}${item.images[0]}` ||
+                          "/placeholder.svg"
+                        }
                         alt={item.title}
                         className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                       />
                     </div>
                     <div className="p-5">
                       <div className="flex justify-between items-center mb-2">
-                        <h3 className="text-lg font-bold text-gray-800 line-clamp-1">{item.title}</h3>
+                        <h3 className="text-lg font-bold text-gray-800 line-clamp-1">
+                          {item.title}
+                        </h3>
                         {item.avgRating ? (
                           <RatingStars rating={item.avgRating} />
                         ) : (
-                          <span className="text-xs text-gray-400">No ratings yet</span>
+                          <span className="text-xs text-gray-400">
+                            No ratings yet
+                          </span>
                         )}
                       </div>
-                      <div className="text-blue-600 font-semibold mb-2">₹{item.pricePerDay}/day</div>
+                      <div className="text-blue-600 font-semibold mb-2">
+                        ₹{item.pricePerDay}/day
+                      </div>
                       <div className="flex items-center text-gray-500 text-sm mb-3">
                         <MapPin size={14} className="mr-1" />
                         {item.location}
@@ -1231,7 +1283,9 @@ export default function BrowseItems() {
                         <Tag size={14} className="mr-1" />
                         {item.category}
                       </div>
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description}</p>
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                        {item.description}
+                      </p>
                       <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">
                         View Details
                       </button>
@@ -1244,7 +1298,9 @@ export default function BrowseItems() {
                 <div className="text-gray-400 mb-4">
                   <Search size={48} className="mx-auto" />
                 </div>
-                <p className="text-gray-500 text-xl">No items match your filters.</p>
+                <p className="text-gray-500 text-xl">
+                  No items match your filters.
+                </p>
                 <button
                   onClick={clearFilters}
                   className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
@@ -1257,5 +1313,5 @@ export default function BrowseItems() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -27,8 +27,8 @@ export const openGooglePopup = () => {
       // localStorage.setItem('token', token);
       console.log(email);
       popup?.close();
-      // setSessionData("email", email);
-      // window.location.reload();
+      setSessionData("email", email);
+      window.location.reload();
       // Optional: trigger login state change or redirect
     } else if (error) {
       console.error("Login failed:", error);
