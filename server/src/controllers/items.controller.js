@@ -1,7 +1,11 @@
+import { fileURLToPath } from "url";
 import Item from "../models/item.js";
 import Rental from "../models/rental.js";
 import Review from "../models/review.js";
 import mongoose from "mongoose";
+import User from "../models/User.js";
+import fs from "fs";
+import path from "path";
 
 export const createItem = async (req, res) => {
   try {
@@ -124,13 +128,20 @@ export const updateItem = async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
     if (!item) return res.status(404).json({ message: "Item not found" });
-    if (item.ownerId.toString() !== req.user.id) {
+    if (item.ownerId.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
-    Object.assign(item, req.body);
+    const data = req.body;
+    const newImages = req.files.map(
+      (file) => `/public/images/itemImages/${file.filename}`
+    );
+    const updatedItemData = { ...data, images: [...item.images, ...newImages] };
+    console.log(updatedItemData);
+    Object.assign(item, updatedItemData);
     const updatedItem = await item.save();
-    res.status(200).json(updatedItem);
+    res.status(200).json({ data: updatedItem });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -280,5 +291,37 @@ export const searchItems = async (req, res) => {
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ message: err.message });
+  }
+};
+
+export const deleteImage = async (req, res) => {
+  try {
+    const { imageName } = req.body;
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    const oldImagePath = path.join(
+      __dirname,
+      "..",
+      "public/images/itemImages",
+      path.basename(imageName)
+    );
+    if (fs.existsSync(oldImagePath)) {
+      fs.unlinkSync(oldImagePath);
+    }
+
+    const { id } = req.params;
+    console.log(id);
+    const item = await Item.findById(id);
+    if (!item) return res.status(404).json({ message: "User not found!" });
+
+    item.images = item.images.filter((img) => img !== imageName);
+
+    await item.save();
+
+    return res.status(200).json({ message: "Image removed successfully!" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: err.message });
   }
 };

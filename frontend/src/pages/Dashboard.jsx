@@ -40,6 +40,7 @@ export default function Dashboard() {
 
   const [editItemId, setEditItemId] = useState(null);
   const [editItemData, setEditItemData] = useState({
+    _id: "",
     title: "",
     category: "",
     subcategory: "",

@@ -20,6 +20,7 @@ const MyItems = ({
     console.log(item);
     setEditItemId(item._id);
     setEditItemData({
+      _id: item._id,
       title: item.title,
       category: item.category,
       subCategory: item.subCategory || "",

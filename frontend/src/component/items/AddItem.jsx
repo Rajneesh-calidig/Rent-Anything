@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from "react";
 import {
   Camera,
   Sofa,
@@ -17,9 +17,9 @@ import {
   Upload,
   ChevronDown,
   FileQuestion,
-} from "lucide-react"
-import { useItem } from "../../providers/Items/ItemProvider"
-import {toast} from 'react-toastify'
+} from "lucide-react";
+import { useItem } from "../../providers/Items/ItemProvider";
+import { toast } from "react-toastify";
 
 export default function AddItem() {
   // State for form data
@@ -27,7 +27,7 @@ export default function AddItem() {
     title: "",
     description: "",
     category: "",
-    subcategory: "",
+    subCategory: "",
     brand: "",
     model: "",
     condition: "Good",
@@ -37,136 +37,199 @@ export default function AddItem() {
     securityDeposit: "",
     location: "",
     images: [],
-  })
+  });
 
-  const [errors, setErrors] = useState({})
-  const [imagePreview, setImagePreview] = useState([])
-  const [subcategories, setSubcategories] = useState([])
-  const {addItem} = useItem()
+  const [errors, setErrors] = useState({});
+  const [imagePreview, setImagePreview] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const { addItem } = useItem();
 
   const categories = [
     {
       name: "Electronics",
       icon: <Camera className="w-5 h-5" />,
-      subcategories: ["Cameras", "Audio Equipment", "Computers", "TVs", "Gaming Consoles", "Drones"],
+      subcategories: [
+        "Cameras",
+        "Audio Equipment",
+        "Computers",
+        "TVs",
+        "Gaming Consoles",
+        "Drones",
+      ],
     },
     {
       name: "Furniture",
       icon: <Sofa className="w-5 h-5" />,
-      subcategories: ["Sofas", "Beds", "Tables", "Chairs", "Storage", "Outdoor Furniture"],
+      subcategories: [
+        "Sofas",
+        "Beds",
+        "Tables",
+        "Chairs",
+        "Storage",
+        "Outdoor Furniture",
+      ],
     },
     {
       name: "Sports",
       icon: <Dumbbell className="w-5 h-5" />,
-      subcategories: ["Fitness Equipment", "Bicycles", "Water Sports", "Winter Sports", "Team Sports", "Golf"],
+      subcategories: [
+        "Fitness Equipment",
+        "Bicycles",
+        "Water Sports",
+        "Winter Sports",
+        "Team Sports",
+        "Golf",
+      ],
     },
     {
       name: "Tools",
       icon: <Wrench className="w-5 h-5" />,
-      subcategories: ["Power Tools", "Hand Tools", "Garden Tools", "Ladders", "Pressure Washers", "Generators"],
+      subcategories: [
+        "Power Tools",
+        "Hand Tools",
+        "Garden Tools",
+        "Ladders",
+        "Pressure Washers",
+        "Generators",
+      ],
     },
     {
       name: "Vehicles",
       icon: <Car className="w-5 h-5" />,
-      subcategories: ["Cars", "Motorcycles", "Bicycles", "Scooters", "Boats", "Trailers"],
+      subcategories: [
+        "Cars",
+        "Motorcycles",
+        "Bicycles",
+        "Scooters",
+        "Boats",
+        "Trailers",
+      ],
     },
     {
       name: "Clothing",
       icon: <Shirt className="w-5 h-5" />,
-      subcategories: ["Formal Wear", "Costumes", "Designer Items", "Accessories", "Shoes", "Jewelry"],
+      subcategories: [
+        "Formal Wear",
+        "Costumes",
+        "Designer Items",
+        "Accessories",
+        "Shoes",
+        "Jewelry",
+      ],
     },
     {
       name: "Books",
       icon: <BookOpen className="w-5 h-5" />,
-      subcategories: ["Textbooks", "Fiction", "Non-Fiction", "Comics", "Magazines", "Rare Books"],
+      subcategories: [
+        "Textbooks",
+        "Fiction",
+        "Non-Fiction",
+        "Comics",
+        "Magazines",
+        "Rare Books",
+      ],
     },
     {
       name: "Outdoor",
       icon: <Tent className="w-5 h-5" />,
-      subcategories: ["Camping Gear", "Hiking Equipment", "Beach Items", "Gardening", "Patio Furniture", "Grills"],
+      subcategories: [
+        "Camping Gear",
+        "Hiking Equipment",
+        "Beach Items",
+        "Gardening",
+        "Patio Furniture",
+        "Grills",
+      ],
     },
     {
-      name:"Others",
-      icon:<FileQuestion className="w-5 h-5" />,
-      subcategories:["Miscellaneous","Uncategorized"]
-    }
-  ]
+      name: "Others",
+      icon: <FileQuestion className="w-5 h-5" />,
+      subcategories: ["Miscellaneous", "Uncategorized"],
+    },
+  ];
 
   // Condition options
-  const conditionOptions = ["Brand New", "Like New", "Excellent", "Good", "Fair", "Acceptable"]
+  const conditionOptions = [
+    "Brand New",
+    "Like New",
+    "Excellent",
+    "Good",
+    "Fair",
+    "Acceptable",
+  ];
 
   // Handle input change
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
     // Clear errors when user types
     if (errors[name]) {
       setErrors({
         ...errors,
         [name]: "",
-      })
+      });
     }
 
     // Update form data
     setFormData({
       ...formData,
       [name]: value,
-    })
+    });
 
     // Update subcategories when category changes
     if (name === "category") {
-      const selectedCategory = categories.find((cat) => cat.name === value)
-      setSubcategories(selectedCategory ? selectedCategory.subcategories : [])
+      const selectedCategory = categories.find((cat) => cat.name === value);
+      setSubcategories(selectedCategory ? selectedCategory.subcategories : []);
 
       // Reset subcategory when category changes
       setFormData({
         ...formData,
         category: value,
-        subcategory: "",
-      })
+        subCategory: "",
+      });
     }
-  }
+  };
 
   // Handle image upload
   const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files)
+    const files = Array.from(e.target.files);
 
     if (files.length > 0) {
       // Limit to 5 images
-      const newFiles = files.slice(0, 5 - formData.images.length)
+      const newFiles = files.slice(0, 5 - formData.images.length);
 
       // Create preview URLs
-      const newPreviews = newFiles.map((file) => URL.createObjectURL(file))
+      const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
 
-      setImagePreview([...imagePreview, ...newPreviews])
+      setImagePreview([...imagePreview, ...newPreviews]);
       setFormData({
         ...formData,
         images: [...formData.images, ...newFiles],
-      })
+      });
     }
-  }
+  };
 
   // Remove image
   const removeImage = (index) => {
-    const updatedImages = [...formData.images]
-    const updatedPreviews = [...imagePreview]
+    const updatedImages = [...formData.images];
+    const updatedPreviews = [...imagePreview];
 
-    updatedImages.splice(index, 1)
-    updatedPreviews.splice(index, 1)
+    updatedImages.splice(index, 1);
+    updatedPreviews.splice(index, 1);
 
     setFormData({
       ...formData,
       images: updatedImages,
-    })
-    setImagePreview(updatedPreviews)
-  }
+    });
+    setImagePreview(updatedPreviews);
+  };
 
   // Calculate weekly and monthly prices based on daily price
   const calculatePrices = (dailyPrice) => {
-    if (!dailyPrice || isNaN(dailyPrice)) return
+    if (!dailyPrice || isNaN(dailyPrice)) return;
 
-    const weekly = Math.round(dailyPrice * 6.5) // 7 days with discount
-    const monthly = Math.round(dailyPrice * 25) // 30 days with discount
+    const weekly = Math.round(dailyPrice * 6.5); // 7 days with discount
+    const monthly = Math.round(dailyPrice * 25); // 30 days with discount
 
     setFormData({
       ...formData,
@@ -174,30 +237,37 @@ export default function AddItem() {
       // pricePerWeek: weekly,
       // pricePerMonth: monthly,
       securityDeposit: Math.round(dailyPrice * 5), // Default securityDeposit is 5x daily rate
-    })
-  }
+    });
+  };
 
   // Validate form
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
     // Required fields
-    if (!formData.title.trim()) newErrors.title = "Title is required"
-    if (!formData.description.trim()) newErrors.description = "Description is required"
-    if (!formData.category) newErrors.category = "Category is required"
-    if (!formData.subcategory) newErrors.subcategory = "Subcategory is required"
-    if (!formData.pricePerDay) newErrors.pricePerDay = "Daily price is required"
-    if (!formData.location.trim()) newErrors.location = "Location is required"
-    if (formData.images.length === 0) newErrors.images = "At least one image is required"
+    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.description.trim())
+      newErrors.description = "Description is required";
+    if (!formData.category) newErrors.category = "Category is required";
+    if (!formData.subCategory)
+      newErrors.subCategory = "Subcategory is required";
+    if (!formData.pricePerDay)
+      newErrors.pricePerDay = "Daily price is required";
+    if (!formData.location.trim()) newErrors.location = "Location is required";
+    if (formData.images.length === 0)
+      newErrors.images = "At least one image is required";
 
     // Price validation
-    if (formData.pricePerDay && (isNaN(formData.pricePerDay) || formData.pricePerDay <= 0)) {
-      newErrors.pricePerDay = "Please enter a valid price"
+    if (
+      formData.pricePerDay &&
+      (isNaN(formData.pricePerDay) || formData.pricePerDay <= 0)
+    ) {
+      newErrors.pricePerDay = "Please enter a valid price";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -212,7 +282,8 @@ export default function AddItem() {
     }
     try {
       const data = new FormData();
-  
+
+      console.log(formData);
       // Append all fields to FormData
       for (const key in formData) {
         if (key === "images") {
@@ -223,24 +294,24 @@ export default function AddItem() {
           data.append(key, formData[key]);
         }
       }
-  
+
       // Send data to backend
       const response = await addItem(data);
-  
+
       // const result = await response.json();
-  
+
       // if (!response.ok) {
       //   throw new Error(result.message || "Failed to create item");
       // }
-  
+
       toast.success("Item added successfully!");
-  
+
       // Reset form
       setFormData({
         title: "",
         description: "",
         category: "",
-        subcategory: "",
+        subCategory: "",
         brand: "",
         model: "",
         condition: "Good",
@@ -257,7 +328,7 @@ export default function AddItem() {
       console.error("Error creating item:", error.message);
       toast.error("Error creating item: " + error.message);
     }
-  }
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4">
@@ -267,7 +338,9 @@ export default function AddItem() {
         <form onSubmit={handleSubmit} enctype="multipart/form-data">
           {/* Basic Information */}
           <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">Basic Information</h2>
+            <h2 className="text-lg font-semibold text-gray-700 mb-4">
+              Basic Information
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -278,10 +351,16 @@ export default function AddItem() {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className={`w-full p-2 border ${errors.title ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
+                  className={`w-full p-2 border ${
+                    errors.title ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
                   placeholder="e.g., Professional DSLR Camera with 3 Lenses"
                 />
-                {errors.title && <p className="mt-1 text-sm text-red-500 error-message">{errors.title}</p>}
+                {errors.title && (
+                  <p className="mt-1 text-sm text-red-500 error-message">
+                    {errors.title}
+                  </p>
+                )}
               </div>
 
               <div className="col-span-2">
@@ -293,10 +372,16 @@ export default function AddItem() {
                   value={formData.description}
                   onChange={handleChange}
                   rows="4"
-                  className={`w-full p-2 border ${errors.description ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
+                  className={`w-full p-2 border ${
+                    errors.description ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
                   placeholder="Describe your item in detail, including its features, condition, and any other relevant information."
                 ></textarea>
-                {errors.description && <p className="mt-1 text-sm text-red-500 error-message">{errors.description}</p>}
+                {errors.description && (
+                  <p className="mt-1 text-sm text-red-500 error-message">
+                    {errors.description}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -308,7 +393,9 @@ export default function AddItem() {
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
-                    className={`w-full p-2 pl-9 border ${errors.category ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none`}
+                    className={`w-full p-2 pl-9 border ${
+                      errors.category ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none`}
                   >
                     <option value="">Select Category</option>
                     {categories.map((category) => (
@@ -319,7 +406,8 @@ export default function AddItem() {
                   </select>
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     {formData.category ? (
-                      categories.find((cat) => cat.name === formData.category)?.icon
+                      categories.find((cat) => cat.name === formData.category)
+                        ?.icon
                     ) : (
                       <ChevronDown className="w-4 h-4 text-gray-400" />
                     )}
@@ -328,7 +416,11 @@ export default function AddItem() {
                     <ChevronDown className="w-4 h-4 text-gray-400" />
                   </div>
                 </div>
-                {errors.category && <p className="mt-1 text-sm text-red-500 error-message">{errors.category}</p>}
+                {errors.category && (
+                  <p className="mt-1 text-sm text-red-500 error-message">
+                    {errors.category}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -336,11 +428,15 @@ export default function AddItem() {
                   Subcategory <span className="text-red-500">*</span>
                 </label>
                 <select
-                  name="subcategory"
-                  value={formData.subcategory}
+                  name="subCategory"
+                  value={formData.subCategory}
                   onChange={handleChange}
                   disabled={!formData.category}
-                  className={`w-full p-2 border ${errors.subcategory ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${!formData.category ? "bg-gray-100" : ""}`}
+                  className={`w-full p-2 border ${
+                    errors.subCategory ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                    !formData.category ? "bg-gray-100" : ""
+                  }`}
                 >
                   <option value="">Select Subcategory</option>
                   {subcategories.map((subcat) => (
@@ -349,11 +445,17 @@ export default function AddItem() {
                     </option>
                   ))}
                 </select>
-                {errors.subcategory && <p className="mt-1 text-sm text-red-500 error-message">{errors.subcategory}</p>}
+                {errors.subCategory && (
+                  <p className="mt-1 text-sm text-red-500 error-message">
+                    {errors.subCategory}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Brand
+                </label>
                 <input
                   type="text"
                   name="brand"
@@ -365,7 +467,9 @@ export default function AddItem() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Model
+                </label>
                 <input
                   type="text"
                   name="model"
@@ -377,7 +481,9 @@ export default function AddItem() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Condition</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Condition
+                </label>
                 <select
                   name="condition"
                   value={formData.condition}
@@ -401,17 +507,25 @@ export default function AddItem() {
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  className={`w-full p-2 border ${errors.location ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
+                  className={`w-full p-2 border ${
+                    errors.location ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
                   placeholder="e.g., Mumbai, Maharashtra"
                 />
-                {errors.location && <p className="mt-1 text-sm text-red-500 error-message">{errors.location}</p>}
+                {errors.location && (
+                  <p className="mt-1 text-sm text-red-500 error-message">
+                    {errors.location}
+                  </p>
+                )}
               </div>
             </div>
           </div>
 
           {/* Pricing */}
           <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">Pricing</h2>
+            <h2 className="text-lg font-semibold text-gray-700 mb-4">
+              Pricing
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -423,18 +537,24 @@ export default function AddItem() {
                     name="pricePerDay"
                     value={formData.pricePerDay}
                     onChange={(e) => {
-                      handleChange(e)
-                      calculatePrices(e.target.value)
+                      handleChange(e);
+                      calculatePrices(e.target.value);
                     }}
                     min="0"
-                    className={`w-full p-2 pl-8 border ${errors.pricePerDay ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
+                    className={`w-full p-2 pl-8 border ${
+                      errors.pricePerDay ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
                     placeholder="0"
                   />
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <span className="text-gray-500">₹</span>
                   </div>
                 </div>
-                {errors.pricePerDay && <p className="mt-1 text-sm text-red-500 error-message">{errors.pricePerDay}</p>}
+                {errors.pricePerDay && (
+                  <p className="mt-1 text-sm text-red-500 error-message">
+                    {errors.pricePerDay}
+                  </p>
+                )}
               </div>
 
               {/* <div>
@@ -553,14 +673,25 @@ export default function AddItem() {
                   </p>
                 </div>
               ) : (
-                <label htmlFor="image-upload" className="flex flex-col items-center justify-center cursor-pointer">
+                <label
+                  htmlFor="image-upload"
+                  className="flex flex-col items-center justify-center cursor-pointer"
+                >
                   <Upload className="w-12 h-12 text-gray-400 mb-2" />
-                  <p className="text-gray-700 font-medium">Drag and drop images or click to upload</p>
-                  <p className="text-sm text-gray-500 mt-1">Upload up to 5 high-quality images (Max 5MB each)</p>
+                  <p className="text-gray-700 font-medium">
+                    Drag and drop images or click to upload
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Upload up to 5 high-quality images (Max 5MB each)
+                  </p>
                 </label>
               )}
 
-              {errors.images && <p className="mt-3 text-sm text-red-500 error-message">{errors.images}</p>}
+              {errors.images && (
+                <p className="mt-3 text-sm text-red-500 error-message">
+                  {errors.images}
+                </p>
+              )}
             </div>
           </div>
 
@@ -576,5 +707,5 @@ export default function AddItem() {
         </form>
       </div>
     </div>
-  )
+  );
 }

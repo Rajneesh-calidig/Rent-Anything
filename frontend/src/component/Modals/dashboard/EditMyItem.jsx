@@ -1,5 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { Upload, Trash, X } from "lucide-react";
+import { useItem } from "../../../providers/Items/ItemProvider";
+import {
+  Camera,
+  Sofa,
+  Dumbbell,
+  Wrench,
+  Music,
+  Laptop,
+  Car,
+  Shirt,
+  BookOpen,
+  Utensils,
+  Tent,
+  Gamepad,
+  Plus,
+  ChevronDown,
+  FileQuestion,
+} from "lucide-react";
+import { useLoader } from "../../../providers/Loader/LoaderProvider";
 
 const EditMyItem = ({
   setShowEditModal,
@@ -12,32 +32,165 @@ const EditMyItem = ({
   imagesToDelete,
 }) => {
   const [activeImageTab, setActiveImageTab] = useState(0);
-
+  const [imagePreview, setImagePreview] = useState([...editItemData?.images]);
+  // const categories = [
+  //   {
+  //     name: "Electronics",
+  //     icon: <Camera className="w-5 h-5" />,
+  //     subcategories: [
+  //       "Cameras",
+  //       "Audio Equipment",
+  //       "Computers",
+  //       "TVs",
+  //       "Gaming Consoles",
+  //       "Drones",
+  //     ],
+  //   },
+  //   {
+  //     name: "Furniture",
+  //     icon: <Sofa className="w-5 h-5" />,
+  //     subcategories: [
+  //       "Sofas",
+  //       "Beds",
+  //       "Tables",
+  //       "Chairs",
+  //       "Storage",
+  //       "Outdoor Furniture",
+  //     ],
+  //   },
+  //   {
+  //     name: "Sports",
+  //     icon: <Dumbbell className="w-5 h-5" />,
+  //     subcategories: [
+  //       "Fitness Equipment",
+  //       "Bicycles",
+  //       "Water Sports",
+  //       "Winter Sports",
+  //       "Team Sports",
+  //       "Golf",
+  //     ],
+  //   },
+  //   {
+  //     name: "Tools",
+  //     icon: <Wrench className="w-5 h-5" />,
+  //     subcategories: [
+  //       "Power Tools",
+  //       "Hand Tools",
+  //       "Garden Tools",
+  //       "Ladders",
+  //       "Pressure Washers",
+  //       "Generators",
+  //     ],
+  //   },
+  //   {
+  //     name: "Vehicles",
+  //     icon: <Car className="w-5 h-5" />,
+  //     subcategories: [
+  //       "Cars",
+  //       "Motorcycles",
+  //       "Bicycles",
+  //       "Scooters",
+  //       "Boats",
+  //       "Trailers",
+  //     ],
+  //   },
+  //   {
+  //     name: "Clothing",
+  //     icon: <Shirt className="w-5 h-5" />,
+  //     subcategories: [
+  //       "Formal Wear",
+  //       "Costumes",
+  //       "Designer Items",
+  //       "Accessories",
+  //       "Shoes",
+  //       "Jewelry",
+  //     ],
+  //   },
+  //   {
+  //     name: "Books",
+  //     icon: <BookOpen className="w-5 h-5" />,
+  //     subcategories: [
+  //       "Textbooks",
+  //       "Fiction",
+  //       "Non-Fiction",
+  //       "Comics",
+  //       "Magazines",
+  //       "Rare Books",
+  //     ],
+  //   },
+  //   {
+  //     name: "Outdoor",
+  //     icon: <Tent className="w-5 h-5" />,
+  //     subcategories: [
+  //       "Camping Gear",
+  //       "Hiking Equipment",
+  //       "Beach Items",
+  //       "Gardening",
+  //       "Patio Furniture",
+  //       "Grills",
+  //     ],
+  //   },
+  //   {
+  //     name: "Others",
+  //     icon: <FileQuestion className="w-5 h-5" />,
+  //     subcategories: ["Miscellaneous", "Uncategorized"],
+  //   },
+  // ];
+  // const conditionOptions = [
+  //   "Brand New",
+  //   "Like New",
+  //   "Excellent",
+  //   "Good",
+  //   "Fair",
+  //   "Acceptable",
+  // ];
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    const fileObjects = files.map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-      isNew: true,
-    }));
-    setNewImages([...newImages, ...fileObjects]);
-  };
-
-  const handleRemoveImage = (index, isNew = false) => {
-    if (isNew) {
-      const updatedNewImages = [...newImages];
-      updatedNewImages.splice(index, 1);
-      setNewImages(updatedNewImages);
-    } else {
-      const imageToDelete = editItemData.images[index];
-      setImagesToDelete([...imagesToDelete, imageToDelete]);
-
-      const updatedImages = [...editItemData.images];
-      updatedImages.splice(index, 1);
+    if (files.length > 0) {
+      const newFiles = files.slice(0, 5 - imagePreview.length);
+      const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+      setImagePreview([...imagePreview, ...newPreviews]);
       setEditItemData({
         ...editItemData,
-        images: updatedImages,
+        itemsImages: editItemData?.itemsImages
+          ? [...editItemData?.itemsImages, ...newFiles]
+          : [...newFiles],
       });
+    }
+  };
+
+  const { deleteImage, updateItem } = useItem();
+  const loader = useLoader();
+  const handleRemoveImage = async (index, isNew = false) => {
+    const name = imagePreview[index];
+    if (name[0] === "/") {
+      try {
+        loader.start();
+        const res = await deleteImage(name, editItemData._id);
+        if (res.status === 200) {
+          setImagePreview((prevImage) => {
+            return prevImage.filter((img) => img !== name);
+          });
+          console.log(editItemData);
+          const updatedImages = editItemData.images.filter(
+            (img) => img !== name
+          );
+          setEditItemData({ ...editItemData, images: [...updatedImages] });
+          toast.success("Image Deleted Sucessfully!");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error(err);
+      } finally {
+        loader.stop();
+      }
+    } else {
+      setImagePreview((prevState) => {
+        return prevState.filter((img) => img !== name);
+      });
+      const updatedItemImages = [...editItemData.itemsImages];
+      updatedItemImages.splice(index - editItemData.images.length, 1);
+      setEditItemData({ ...editItemData, itemsImages: updatedItemImages });
     }
   };
 
@@ -60,17 +213,47 @@ const EditMyItem = ({
       formData.append(`newImage${index}`, image.file);
     });
 
-    console.log("Saving edited item:", editItemId);
-    console.log("Form data contains:", {
-      ...editItemData,
-      newImages: newImages.length,
-      imagesToDelete,
-    });
-
     setShowEditModal(false);
     setEditItemId(null);
   };
 
+  // const { updateItem } = useItem();
+  const handleUpdateItem = async (e) => {
+    e.preventDefault();
+    try {
+      loader.start();
+      console.log(editItemData);
+      const formData = new FormData();
+
+      for (const key in editItemData) {
+        if (key === "itemsImages") {
+          editItemData.itemsImages.forEach((image) => {
+            formData.append("itemsImages", image);
+          });
+        } else if (
+          key === "_id" ||
+          key === "createdAt" ||
+          key === "updatedAt"
+        ) {
+          continue;
+        } else {
+          formData.append(key, editItemData[key]);
+        }
+      }
+      console.log(formData);
+      const response = await updateItem(editItemData._id, formData);
+      if (response.status === 200) {
+        toast.success("Updated Successfully!");
+        setShowEditModal(false);
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response.data);
+    } finally {
+      loader.stop();
+    }
+  };
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -85,7 +268,7 @@ const EditMyItem = ({
         </div>
 
         <div className="p-6">
-          <form onSubmit={handleSaveEdit} className="space-y-6">
+          <form onSubmit={handleUpdateItem} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -118,6 +301,8 @@ const EditMyItem = ({
                 >
                   <option value="">Select Category</option>
                   <option value="electronics">Electronics</option>
+                  <option value="Furniture">Furniture</option>
+                  <option value="Vehicles">Vehicles</option>
                   <option value="sports">Sports</option>
                   <option value="tools">Tools</option>
                   <option value="outdoor">Outdoor</option>
@@ -135,7 +320,7 @@ const EditMyItem = ({
                   onChange={(e) =>
                     setEditItemData({
                       ...editItemData,
-                      subcategory: e.target.value,
+                      subCategory: e.target.value,
                     })
                   }
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
@@ -285,206 +470,84 @@ const EditMyItem = ({
                 Manage Images
               </h3>
 
-              <div className="flex border-b">
-                <button
-                  type="button"
-                  className={`px-4 py-2 font-medium ${
-                    activeImageTab === 0
-                      ? "text-indigo-600 border-b-2 border-indigo-600"
-                      : "text-gray-500"
-                  }`}
-                  onClick={() => setActiveImageTab(0)}
-                >
-                  Current Images
-                </button>
-                <button
-                  type="button"
-                  className={`px-4 py-2 font-medium ${
-                    activeImageTab === 1
-                      ? "text-indigo-600 border-b-2 border-indigo-600"
-                      : "text-gray-500"
-                  }`}
-                  onClick={() => setActiveImageTab(1)}
-                >
-                  Add New Images
-                </button>
-              </div>
+              <div className="mb-8">
+                <h2 className="text-lg font-semibold text-gray-700 mb-4">
+                  Images
+                </h2>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <input
+                    type="file"
+                    id="image-upload"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
 
-              <div className="mt-4">
-                {activeImageTab === 0 && (
-                  <div>
-                    {editItemData.images && editItemData.images.length > 0 ? (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {editItemData.images.map((image, index) => (
-                          <div
-                            key={index}
-                            className="relative group border rounded-lg overflow-hidden"
-                          >
+                  {imagePreview.length > 0 ? (
+                    <div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4">
+                        {imagePreview.map((src, index) => (
+                          <div key={index} className="relative group">
                             <img
-                              src={`${import.meta.env.VITE_FILE_URL}${image}`}
-                              alt={`Item image ${index + 1}`}
-                              className="w-full h-32 object-cover"
+                              src={
+                                src[0] === "/"
+                                  ? `${import.meta.env.VITE_FILE_URL}${src}`
+                                  : src
+                              }
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg"
                             />
-                            <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                              <button
-                                type="button"
-                                // onClick={() => handleMoveImage(index, "up")}
-                                className="p-1 bg-white rounded-full text-gray-700 hover:text-indigo-600"
-                                disabled={index === 0}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              </button>
-                              <button
-                                type="button"
-                                // onClick={() => handleMoveImage(index, "down")}
-                                className="p-1 bg-white rounded-full text-gray-700 hover:text-indigo-600"
-                                disabled={
-                                  index === editItemData.images.length - 1
-                                }
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveImage(index)}
-                                className="p-1 bg-white rounded-full text-red-600 hover:text-red-800"
-                              >
-                                <Trash size={16} />
-                              </button>
-                            </div>
-                            {index === 0 && (
-                              <div className="absolute top-0 left-0 bg-indigo-600 text-white text-xs px-2 py-1 rounded-br-lg">
-                                Main
-                              </div>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(index)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
                           </div>
                         ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-gray-500">
-                        No images available. Add some new images.
-                      </div>
-                    )}
-                  </div>
-                )}
 
-                {activeImageTab === 1 && (
-                  <div>
-                    <div className="mb-4">
-                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                          <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">
-                              Click to upload
-                            </span>{" "}
-                            or drag and drop
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            PNG, JPG or JPEG (MAX. 5MB)
-                          </p>
-                        </div>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/*"
-                          multiple
-                          onChange={handleImageUpload}
-                        />
-                      </label>
+                        {imagePreview.length < 5 && (
+                          <label
+                            htmlFor="image-upload"
+                            className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                          >
+                            <Plus className="w-8 h-8 text-gray-400" />
+                            <span className="text-sm text-gray-500">
+                              Add More
+                            </span>
+                          </label>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        {imagePreview.length}/5 images uploaded.{" "}
+                        {imagePreview.length < 5
+                          ? `You can add ${5 - imagePreview.length} more.`
+                          : "Maximum limit reached."}
+                      </p>
                     </div>
+                  ) : (
+                    <label
+                      htmlFor="image-upload"
+                      className="flex flex-col items-center justify-center cursor-pointer"
+                    >
+                      <Upload className="w-12 h-12 text-gray-400 mb-2" />
+                      <p className="text-gray-700 font-medium">
+                        Drag and drop images or click to upload
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Upload up to 5 high-quality images (Max 5MB each)
+                      </p>
+                    </label>
+                  )}
 
-                    {newImages.length > 0 && (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {newImages.map((image, index) => (
-                          <div
-                            key={index}
-                            className="relative group border rounded-lg overflow-hidden"
-                          >
-                            <img
-                              src={image.preview || "/placeholder.svg"}
-                              alt={`New image ${index + 1}`}
-                              className="w-full h-32 object-cover"
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleMoveImage(index, "up", true)
-                                }
-                                className="p-1 bg-white rounded-full text-gray-700 hover:text-indigo-600"
-                                disabled={index === 0}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleMoveImage(index, "down", true)
-                                }
-                                className="p-1 bg-white rounded-full text-gray-700 hover:text-indigo-600"
-                                disabled={index === newImages.length - 1}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveImage(index, true)}
-                                className="p-1 bg-white rounded-full text-red-600 hover:text-red-800"
-                              >
-                                <Trash size={16} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
+                  {/* {errors.images && (
+                    <p className="mt-3 text-sm text-red-500 error-message">
+                      {errors.images}
+                    </p>
+                  )} */}
+                </div>
               </div>
             </div>
 
@@ -492,6 +555,7 @@ const EditMyItem = ({
               <button
                 type="submit"
                 className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 transition-colors"
+                // onClick={handleUpdateItem}
               >
                 Save Changes
               </button>
