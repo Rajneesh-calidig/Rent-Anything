@@ -47,8 +47,8 @@ export const SignIn = () => {
       ) {
         return;
       }
-      window.location.reload();
       navigate("/home");
+      window.location.reload();
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
