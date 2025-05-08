@@ -1,7 +1,5 @@
-"use client"
-
-import { useRef, useState } from "react"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
@@ -9,32 +7,31 @@ import {
   faSearch,
   faTags,
   faDollarSign,
-  faShield,
-  faHandshake,
-  faUsers,
-} from "@fortawesome/free-solid-svg-icons"
-import Bannar from "../../assets/bannar/bannar.png"
-import { useNavigate } from "react-router-dom"
+} from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
-  const scrollRef = useRef(null)
-  const [dateRange, setDateRange] = useState({ start: "", end: "" })
-  const [category, setCategory] = useState("All")
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 })
+  const scrollRef = useRef(null);
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+  const [category, setCategory] = useState("All");
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
   const navigate = useNavigate();
 
   const scroll = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = 300
+      const scrollAmount = 300;
       scrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
-      })
+      });
     }
-  }
+  };
 
   const cities = [
-    { city: "rewari", img: "https://www.holidify.com/images/bgImages/BANGALORE.jpg" },
+    {
+      city: "rewari",
+      img: "https://www.holidify.com/images/bgImages/BANGALORE.jpg",
+    },
     {
       city: "rohtak",
       img: "https://images.unsplash.com/photo-1617516202907-ff75846e6667?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGF3YSUyMG1haGFsJTIwamFpcHVyJTIwaW5kaWF8ZW58MHx8MHx8fDA%3D",
@@ -59,13 +56,20 @@ export const Home = () => {
       city: "Chandigarh",
       img: "https://thumbs.dreamstime.com/b/elante-mall-chandigarh-elante-mall-chandigarh-enjoy-life-like-159023609.jpg",
     },
-  ]
+  ];
 
-  const categories = ["Electronics", "Furniture", "Vehicles", "Tools", "Clothing", "Sports", "Party Supplies"]
+  const categories = [
+    "Electronics",
+    "Furniture",
+    "Vehicles",
+    "Tools",
+    "Clothing",
+    "Sports",
+    "Party Supplies",
+  ];
 
   return (
     <div className="w-full font-sans bg-gradient-to-b from-white to-gray-50">
-
       <section className="relative bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-4 sm:px-6 md:px-16 py-16 md:py-24">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
@@ -74,8 +78,9 @@ export const Home = () => {
                 Rent Anything You Need, Anytime, Anywhere
               </h1>
               <p className="mt-6 text-gray-600 text-lg max-w-xl">
-                Discover a world of convenience with our Rent Anything platform. From tools to vacation gear, we connect
-                you with what you need, when you need it.
+                Discover a world of convenience with our Rent Anything platform.
+                From tools to vacation gear, we connect you with what you need,
+                when you need it.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
                 <button className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition-all transform hover:scale-105">
@@ -89,12 +94,17 @@ export const Home = () => {
 
             {/* Search Box */}
             <div className="md:w-5/12 mt-12 md:mt-0 bg-white p-6 rounded-2xl shadow-xl">
-              <h2 className="text-xl font-semibold mb-4 text-center">Find What You Need</h2>
+              <h2 className="text-xl font-semibold mb-4 text-center">
+                Find What You Need
+              </h2>
 
               {/* Date Range */}
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-medium mb-2 flex items-center">
-                  <FontAwesomeIcon icon={faCalendarDays} className="mr-2 text-gray-500" />
+                  <FontAwesomeIcon
+                    icon={faCalendarDays}
+                    className="mr-2 text-gray-500"
+                  />
                   Date Range
                 </label>
                 <div className="flex space-x-2">
@@ -102,17 +112,32 @@ export const Home = () => {
                     type="date"
                     className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     min={new Date().toISOString().split("T")[0]}
-                    max={dateRange.end || new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString().split("T")[0]}
+                    max={
+                      dateRange.end ||
+                      new Date(new Date().setMonth(new Date().getMonth() + 4))
+                        .toISOString()
+                        .split("T")[0]
+                    }
                     value={dateRange.start}
-                    onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                    onChange={(e) =>
+                      setDateRange({ ...dateRange, start: e.target.value })
+                    }
                   />
                   <input
                     type="date"
                     className="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     value={dateRange.end}
-                    onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-                    min={dateRange.start || new Date().toISOString().split("T")[0]}
-                    max={new Date(new Date().setMonth(new Date().getMonth() + 4)).toISOString().split("T")[0]}
+                    onChange={(e) =>
+                      setDateRange({ ...dateRange, end: e.target.value })
+                    }
+                    min={
+                      dateRange.start || new Date().toISOString().split("T")[0]
+                    }
+                    max={
+                      new Date(new Date().setMonth(new Date().getMonth() + 4))
+                        .toISOString()
+                        .split("T")[0]
+                    }
                   />
                 </div>
               </div>
@@ -120,7 +145,10 @@ export const Home = () => {
               {/* Category */}
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-medium mb-2 flex items-center">
-                  <FontAwesomeIcon icon={faTags} className="mr-2 text-gray-500" />
+                  <FontAwesomeIcon
+                    icon={faTags}
+                    className="mr-2 text-gray-500"
+                  />
                   Category
                 </label>
                 <select
@@ -140,7 +168,10 @@ export const Home = () => {
               {/* Price Range */}
               <div className="mb-6">
                 <label className="block text-gray-700 text-sm font-medium mb-2 flex items-center">
-                  <FontAwesomeIcon icon={faDollarSign} className="mr-2 text-gray-500" />
+                  <FontAwesomeIcon
+                    icon={faDollarSign}
+                    className="mr-2 text-gray-500"
+                  />
                   Price Range (₹{priceRange.min} - ₹{priceRange.max})
                 </label>
                 <div className="flex items-center space-x-4">
@@ -151,7 +182,12 @@ export const Home = () => {
                     step="50"
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                     value={priceRange.max}
-                    onChange={(e) => setPriceRange({ ...priceRange, max: Number.parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setPriceRange({
+                        ...priceRange,
+                        max: Number.parseInt(e.target.value),
+                      })
+                    }
                   />
                 </div>
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -161,7 +197,14 @@ export const Home = () => {
               </div>
 
               {/* Search Button */}
-              <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-all flex items-center justify-center" onClick={() =>navigate(`/search?category=${category}&minPrice=${priceRange.min}&maxPrice=${priceRange.max}&startDate=${dateRange.start}&endDate=${dateRange.end}`)}>
+              <button
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-all flex items-center justify-center"
+                onClick={() =>
+                  navigate(
+                    `/search?category=${category}&minPrice=${priceRange.min}&maxPrice=${priceRange.max}&startDate=${dateRange.start}&endDate=${dateRange.end}`
+                  )
+                }
+              >
                 <FontAwesomeIcon icon={faSearch} className="mr-2" />
                 Search Available Rentals
               </button>
@@ -228,7 +271,9 @@ export const Home = () => {
       {/* Popular Categories Section */}
       <section className="px-4 sm:px-6 md:px-16 py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Popular Categories</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Popular Categories
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
             {categories.map((cat, index) => (
               <div
@@ -250,7 +295,8 @@ export const Home = () => {
       <section className="text-center px-4 sm:px-6 md:px-16 py-16">
         <h2 className="text-3xl font-bold mb-2">Explore Cities Across India</h2>
         <p className="text-gray-600 mb-12 max-w-3xl mx-auto">
-          Find rentals in major cities throughout India. Our platform connects you with local providers wherever you go.
+          Find rentals in major cities throughout India. Our platform connects
+          you with local providers wherever you go.
         </p>
 
         <div className="relative max-w-6xl mx-auto">
@@ -259,7 +305,11 @@ export const Home = () => {
             onClick={() => scroll("left")}
             className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white p-4 rounded-full shadow-lg z-10 hover:bg-gray-100 transition-all"
           >
-            <FontAwesomeIcon icon={faChevronLeft} size="lg" className="text-gray-700" />
+            <FontAwesomeIcon
+              icon={faChevronLeft}
+              size="lg"
+              className="text-gray-700"
+            />
           </button>
 
           {/* Scrollable Carousel */}
@@ -284,7 +334,10 @@ export const Home = () => {
                   <p className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     Explore rentals in {place.city}
                   </p>
-                  <button className="mt-3 bg-white cursor-pointer text-black px-4 py-2 rounded-lg font-medium opacity-0 group-hover:opacity-100 transition-all transform translate-y-4 group-hover:translate-y-0" onClick={() => navigate(`/search?location=${place.city}`)}>
+                  <button
+                    className="mt-3 bg-white cursor-pointer text-black px-4 py-2 rounded-lg font-medium opacity-0 group-hover:opacity-100 transition-all transform translate-y-4 group-hover:translate-y-0"
+                    onClick={() => navigate(`/search?location=${place.city}`)}
+                  >
                     View Listings
                   </button>
                 </div>
@@ -297,7 +350,11 @@ export const Home = () => {
             onClick={() => scroll("right")}
             className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white p-4 rounded-full shadow-lg z-10 hover:bg-gray-100 transition-all"
           >
-            <FontAwesomeIcon icon={faChevronRight} size="lg" className="text-gray-700" />
+            <FontAwesomeIcon
+              icon={faChevronRight}
+              size="lg"
+              className="text-gray-700"
+            />
           </button>
         </div>
       </section>
@@ -321,136 +378,5 @@ export const Home = () => {
         </div>
       </section> */}
     </div>
-  )
-}
-
-
-// import React, { useRef } from "react";
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
-// import Bannar from "../../assets/bannar/bannar.png"
-// import Bannar2 from "../../assets/bannar/bannar2.png"
-
-// export const Home = () => {
-//   const scrollRef = useRef(null);
-
-//   const scroll = (direction) => {
-//     if (scrollRef.current) {
-//       const scrollAmount = 300; // Adjust based on image width
-//       scrollRef.current.scrollBy({
-//         left: direction === "left" ? -scrollAmount : scrollAmount,
-//         behavior: "smooth",
-//       });
-//     }
-//   };
-
-//   const cities = [
-//     { city: "Bangalore", img: "https://www.holidify.com/images/bgImages/BANGALORE.jpg" },
-//     { city: "Jaipur", img: "https://images.unsplash.com/photo-1617516202907-ff75846e6667?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGF3YSUyMG1haGFsJTIwamFpcHVyJTIwaW5kaWF8ZW58MHx8MHx8fDA%3D" },
-//     { city: "Kolkata", img: "https://media.istockphoto.com/id/1005830448/photo/howrah-bridge.jpg?s=612x612&w=0&k=20&c=g5Zbl2IKWsKdkrxxfDs4zSYQjStH0xvNuq0pc6WH_vk=" },
-//     { city: "Chennai", img: "https://www.shutterstock.com/image-photo/beautiful-view-valluvar-kottamauditorium-monument-600nw-1763868740.jpg" },
-//     { city: "Mumbai", img: "https://static.toiimg.com/thumb/msid-88428704,imgsize-139696,width-900,height-1200,resizemode-6/88428704.jpg" },
-//     { city: "Delhi", img: "https://media2.thrillophilia.com/images/photos/000/044/480/original/1524478881_shutterstock_418380280.jpg?w=753&h=450&dpr=1.5" },
-//     { city: "Chandigarh", img: "https://thumbs.dreamstime.com/b/elante-mall-chandigarh-elante-mall-chandigarh-enjoy-life-like-159023609.jpg" }
-//   ];
-
-// return (
-//   <div className="w-full font-sans">
-//     {/* Hero Section */}
-//     <section className="px-4 sm:px-6 md:px-16 py-12 md:py-20 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-//       <div className="md:w-1/2">
-//         <h1 className="text-3xl md:text-5xl font-bold leading-tight">
-//           Rent Anything You Need, Anytime, Anywhere
-//         </h1>
-//       </div>
-//       <div className="md:w-1/2 mt-6 md:mt-0">
-//         <p className="text-gray-600">
-//           Discover a world of convenience with our Rent Anything platform.
-//           From tools to vacation gear, we connect you with what you need,
-//           when you need it.
-//         </p>
-//         <div className="mt-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-//           <button className="bg-black text-white px-6 py-2 rounded">Get Started</button>
-//           <button className="border border-black px-6 py-2 rounded">Learn More</button>
-//         </div>
-//       </div>
-//     </section>
-
-//     {/* Banner */}
-//     <div className="mx-4 sm:mx-6 md:mx-10 h-[50vh] md:h-screen bg-gray-300 flex items-center justify-center relative">
-//       <img 
-//         src={Bannar} 
-//         className="w-full h-full object-cover rounded-lg"
-//         alt="Banner"
-//       />
-//     </div>
-
-//     {/* Features Section */}
-//     <section className="text-center px-4 sm:px-6 py-12">
-//       <h2 className="text-2xl font-semibold">
-//         Discover an Extensive Selection of Rental Products for Every Need
-//       </h2>
-//       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-//         <div className="p-6 bg-white shadow-md rounded">
-//           <h3 className="font-semibold">Hassle-Free Renting</h3>
-//           <p className="text-gray-600 mt-2">Browse, select, and enjoy renting in no time.</p>
-//         </div>
-//         <div className="p-6 bg-white shadow-md rounded">
-//           <h3 className="font-semibold">Secure Payments</h3>
-//           <p className="text-gray-600 mt-2">Your security is our priority.</p>
-//         </div>
-//         <div className="p-6 bg-white shadow-md rounded">
-//           <h3 className="font-semibold">Join Our Community</h3>
-//           <p className="text-gray-600 mt-2">Connect with happy renters and providers.</p>
-//         </div>
-//       </div>
-//     </section>
-
-//     {/* Cities Section */}
-//     <section className="text-center px-6 py-12 relative">
-//       <h2 className="text-2xl font-semibold">Zoom around all over India</h2>
-//       <div className="flex justify-center items-center mt-6 relative w-1/2 mx-auto">
-//          {/* Left Button */}
-//          <button
-//            onClick={() => scroll("left")}
-//           className="absolute left-0 bg-gray-200 p-3 rounded-full shadow-md z-10"
-//         >
-//            <FontAwesomeIcon icon={faChevronLeft} size="lg" />
-//         </button>
-
-//          {/* Scrollable Carousel */}
-//          <div
-//            ref={scrollRef}
-//           className="flex overflow-x-auto space-x-4 scrollbar-hide px-10 scroll-smooth"
-//            style={{ scrollBehavior: "smooth", overflowX: "hidden" }}
-//          >
-//            {cities.map((place, index) => (
-//              <div
-//                key={index}
-//                className="w-64 h-80 bg-gray-300 flex items-end p-4 rounded-lg shadow-md text-white"
-//                style={{
-//                  backgroundImage: `url(${place.img})`,
-//                  backgroundSize: "cover",
-//                  backgroundPosition: "center",
-//                  flexShrink: 0,
-//                }}
-//              >
-//                <h3 className="bg-opacity-50 px-3 py-1 rounded text-white text-lg mx-auto font-semibold">
-//                  {place.city}
-//                </h3>
-//              </div>
-//            ))}
-//          </div>
-
-//          {/* Right Button */}
-//          <button
-//            onClick={() => scroll("right")}
-//            className="absolute right-0 bg-gray-200 p-3 rounded-full shadow-md z-10"
-//         >
-//            <FontAwesomeIcon icon={faChevronRight} size="lg" />
-//         </button>
-//       </div>
-//     </section>
-//   </div>
-// );
-// };
+  );
+};

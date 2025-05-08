@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { Upload, Trash, X } from "lucide-react";
-import { useItem } from "../../../providers/Items/ItemProvider";
 import {
   Camera,
   Sofa,
@@ -16,9 +13,13 @@ import {
   Tent,
   Gamepad,
   Plus,
+  X,
+  Upload,
   ChevronDown,
   FileQuestion,
 } from "lucide-react";
+import { toast } from "react-toastify";
+import { useItem } from "../../../providers/Items/ItemProvider";
 import { useLoader } from "../../../providers/Loader/LoaderProvider";
 
 const EditMyItem = ({
@@ -33,117 +34,126 @@ const EditMyItem = ({
 }) => {
   const [activeImageTab, setActiveImageTab] = useState(0);
   const [imagePreview, setImagePreview] = useState([...editItemData?.images]);
-  // const categories = [
-  //   {
-  //     name: "Electronics",
-  //     icon: <Camera className="w-5 h-5" />,
-  //     subcategories: [
-  //       "Cameras",
-  //       "Audio Equipment",
-  //       "Computers",
-  //       "TVs",
-  //       "Gaming Consoles",
-  //       "Drones",
-  //     ],
-  //   },
-  //   {
-  //     name: "Furniture",
-  //     icon: <Sofa className="w-5 h-5" />,
-  //     subcategories: [
-  //       "Sofas",
-  //       "Beds",
-  //       "Tables",
-  //       "Chairs",
-  //       "Storage",
-  //       "Outdoor Furniture",
-  //     ],
-  //   },
-  //   {
-  //     name: "Sports",
-  //     icon: <Dumbbell className="w-5 h-5" />,
-  //     subcategories: [
-  //       "Fitness Equipment",
-  //       "Bicycles",
-  //       "Water Sports",
-  //       "Winter Sports",
-  //       "Team Sports",
-  //       "Golf",
-  //     ],
-  //   },
-  //   {
-  //     name: "Tools",
-  //     icon: <Wrench className="w-5 h-5" />,
-  //     subcategories: [
-  //       "Power Tools",
-  //       "Hand Tools",
-  //       "Garden Tools",
-  //       "Ladders",
-  //       "Pressure Washers",
-  //       "Generators",
-  //     ],
-  //   },
-  //   {
-  //     name: "Vehicles",
-  //     icon: <Car className="w-5 h-5" />,
-  //     subcategories: [
-  //       "Cars",
-  //       "Motorcycles",
-  //       "Bicycles",
-  //       "Scooters",
-  //       "Boats",
-  //       "Trailers",
-  //     ],
-  //   },
-  //   {
-  //     name: "Clothing",
-  //     icon: <Shirt className="w-5 h-5" />,
-  //     subcategories: [
-  //       "Formal Wear",
-  //       "Costumes",
-  //       "Designer Items",
-  //       "Accessories",
-  //       "Shoes",
-  //       "Jewelry",
-  //     ],
-  //   },
-  //   {
-  //     name: "Books",
-  //     icon: <BookOpen className="w-5 h-5" />,
-  //     subcategories: [
-  //       "Textbooks",
-  //       "Fiction",
-  //       "Non-Fiction",
-  //       "Comics",
-  //       "Magazines",
-  //       "Rare Books",
-  //     ],
-  //   },
-  //   {
-  //     name: "Outdoor",
-  //     icon: <Tent className="w-5 h-5" />,
-  //     subcategories: [
-  //       "Camping Gear",
-  //       "Hiking Equipment",
-  //       "Beach Items",
-  //       "Gardening",
-  //       "Patio Furniture",
-  //       "Grills",
-  //     ],
-  //   },
-  //   {
-  //     name: "Others",
-  //     icon: <FileQuestion className="w-5 h-5" />,
-  //     subcategories: ["Miscellaneous", "Uncategorized"],
-  //   },
-  // ];
-  // const conditionOptions = [
-  //   "Brand New",
-  //   "Like New",
-  //   "Excellent",
-  //   "Good",
-  //   "Fair",
-  //   "Acceptable",
-  // ];
+  const [categoryIndex, setCategoryIndex] = useState();
+  const categories = [
+    {
+      name: "Electronics",
+      icon: <Camera className="w-5 h-5" />,
+      subcategories: [
+        "Cameras",
+        "Audio Equipment",
+        "Computers",
+        "TVs",
+        "Gaming Consoles",
+        "Drones",
+      ],
+    },
+    {
+      name: "Furniture",
+      icon: <Sofa className="w-5 h-5" />,
+      subcategories: [
+        "Sofas",
+        "Beds",
+        "Tables",
+        "Chairs",
+        "Storage",
+        "Outdoor Furniture",
+      ],
+    },
+    {
+      name: "Sports",
+      icon: <Dumbbell className="w-5 h-5" />,
+      subcategories: [
+        "Fitness Equipment",
+        "Bicycles",
+        "Water Sports",
+        "Winter Sports",
+        "Team Sports",
+        "Golf",
+      ],
+    },
+    {
+      name: "Tools",
+      icon: <Wrench className="w-5 h-5" />,
+      subcategories: [
+        "Power Tools",
+        "Hand Tools",
+        "Garden Tools",
+        "Ladders",
+        "Pressure Washers",
+        "Generators",
+      ],
+    },
+    {
+      name: "Vehicles",
+      icon: <Car className="w-5 h-5" />,
+      subcategories: [
+        "Cars",
+        "Motorcycles",
+        "Bicycles",
+        "Scooters",
+        "Boats",
+        "Trailers",
+      ],
+    },
+    {
+      name: "Clothing",
+      icon: <Shirt className="w-5 h-5" />,
+      subcategories: [
+        "Formal Wear",
+        "Costumes",
+        "Designer Items",
+        "Accessories",
+        "Shoes",
+        "Jewelry",
+      ],
+    },
+    {
+      name: "Books",
+      icon: <BookOpen className="w-5 h-5" />,
+      subcategories: [
+        "Textbooks",
+        "Fiction",
+        "Non-Fiction",
+        "Comics",
+        "Magazines",
+        "Rare Books",
+      ],
+    },
+    {
+      name: "Outdoor",
+      icon: <Tent className="w-5 h-5" />,
+      subcategories: [
+        "Camping Gear",
+        "Hiking Equipment",
+        "Beach Items",
+        "Gardening",
+        "Patio Furniture",
+        "Grills",
+      ],
+    },
+    {
+      name: "Others",
+      icon: <FileQuestion className="w-5 h-5" />,
+      subcategories: ["Miscellaneous", "Uncategorized"],
+    },
+  ];
+
+  useEffect(() => {
+    categories.map((category, index) => {
+      category.name === editItemData.category && setCategoryIndex(index);
+    });
+  }, []);
+
+  const conditionOptions = [
+    "Brand New",
+    "Like New",
+    "Excellent",
+    "Good",
+    "Fair",
+    "Acceptable",
+  ];
+
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
@@ -300,21 +310,16 @@ const EditMyItem = ({
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 >
                   <option value="">Select Category</option>
-                  <option value="electronics">Electronics</option>
-                  <option value="Furniture">Furniture</option>
-                  <option value="Vehicles">Vehicles</option>
-                  <option value="sports">Sports</option>
-                  <option value="tools">Tools</option>
-                  <option value="outdoor">Outdoor</option>
-                  <option value="clothing">Clothing</option>
+                  {categories?.map((category, index) => (
+                    <option value={category.name}>{category.name}</option>
+                  ))}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Subcategory
                 </label>
-                <input
-                  type="text"
+                <select
                   name="subCategory"
                   value={editItemData.subCategory}
                   onChange={(e) =>
@@ -324,7 +329,14 @@ const EditMyItem = ({
                     })
                   }
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                />
+                >
+                  <option value="">Select Sub Category</option>
+                  {categories[categoryIndex]?.subcategories?.map(
+                    (category, index) => (
+                      <option value={category}>{category}</option>
+                    )
+                  )}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">

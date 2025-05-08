@@ -23,12 +23,19 @@ import UserSettings from "../component/dashboard/Settings";
 import MyOrders from "../component/dashboard/MyOrders";
 import Transactions from "../component/dashboard/Transactions";
 import EditMyItem from "../component/Modals/dashboard/EditMyItem";
+import { formatTime } from "../utils/date-utils";
+import { differenceInMinutes } from "date-fns";
 
 export default function Dashboard() {
   // State for active section
   const [activeSection, setActiveSection] = useState("overview");
   const [activeSidebarItem, setActiveSidebarItem] = useState("overview");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setActiveSidebarItem(sessionStorage.getItem("activeSidebarItem"));
+    setActiveSection(sessionStorage.getItem("activeSidebarItem"));
+  }, []);
 
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -153,7 +160,10 @@ export default function Dashboard() {
               <div className="ml-3">
                 <p className="font-medium text-gray-800">{user.name}</p>
                 <p className="text-xs text-gray-500">
-                  Member since {user.joinedDate}
+                  Member since{" "}
+                  {formatTime(
+                    differenceInMinutes(new Date(), new Date(user.createdAt))
+                  )}
                 </p>
               </div>
             </div>
@@ -165,6 +175,7 @@ export default function Dashboard() {
               onClick={() => {
                 setActiveSection("overview");
                 setActiveSidebarItem("overview");
+                sessionStorage.setItem("activeSidebarItem", "overview");
                 setMobileMenuOpen(false);
               }}
               className={`flex items-center w-full px-3 py-2 rounded-lg text-left ${
@@ -181,6 +192,7 @@ export default function Dashboard() {
               onClick={() => {
                 setActiveSection("my-items");
                 setActiveSidebarItem("my-items");
+                sessionStorage.setItem("activeSidebarItem", "my-items");
                 setMobileMenuOpen(false);
               }}
               className={`flex items-center w-full px-3 py-2 rounded-lg text-left ${
@@ -196,6 +208,7 @@ export default function Dashboard() {
               onClick={() => {
                 setActiveSection("my-orders");
                 setActiveSidebarItem("my-orders");
+                sessionStorage.setItem("activeSidebarItem", "my-orders");
                 setMobileMenuOpen(false);
               }}
               className={`flex items-center w-full px-3 py-2 rounded-lg text-left ${
@@ -212,6 +225,7 @@ export default function Dashboard() {
               onClick={() => {
                 setActiveSection("transactions");
                 setActiveSidebarItem("transactions");
+                sessionStorage.setItem("activeSidebarItem", "transactions");
                 setMobileMenuOpen(false);
               }}
               className={`flex items-center w-full px-3 py-2 rounded-lg text-left ${
@@ -242,6 +256,7 @@ export default function Dashboard() {
                 // Navigate('/add-item')
                 setActiveSection("add-item");
                 setActiveSidebarItem("add-item");
+                sessionStorage.setItem("activeSidebarItem", "add-item");
                 setMobileMenuOpen(false);
               }}
               className={`flex items-center w-full px-3 py-2 rounded-lg text-left ${
@@ -281,6 +296,7 @@ export default function Dashboard() {
               onClick={() => {
                 setActiveSection("favorites");
                 setActiveSidebarItem("favorites");
+                sessionStorage.setItem("activeSidebarItem", "favorites");
                 setMobileMenuOpen(false);
               }}
               className={`flex items-center w-full px-3 py-2 rounded-lg text-left ${
@@ -302,6 +318,7 @@ export default function Dashboard() {
                 onClick={() => {
                   setActiveSection("profile");
                   setActiveSidebarItem("profile");
+                  sessionStorage.setItem("activeSidebarItem", "profile");
                   setMobileMenuOpen(false);
                 }}
                 className={`flex items-center w-full px-3 py-2 rounded-lg text-left ${
@@ -318,6 +335,7 @@ export default function Dashboard() {
                 onClick={() => {
                   setActiveSection("settings");
                   setActiveSidebarItem("settings");
+                  sessionStorage.setItem("activeSidebarItem", "settings");
                   setMobileMenuOpen(false);
                 }}
                 className={`flex items-center w-full px-3 py-2 rounded-lg text-left ${

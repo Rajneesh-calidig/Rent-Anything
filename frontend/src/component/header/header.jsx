@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faTimes,
-  faBars,
-  faMagnifyingGlass,
-  faUser,
-  faHeart,
-  faShoppingCart,
-} from "@fortawesome/free-solid-svg-icons";
+  Bell,
+  Search,
+  Menu,
+  X,
+  User,
+  LogOut,
+  Settings,
+  LayoutDashboard,
+  Package,
+} from "lucide-react";
 import Logo from "../../assets/img/logo.png";
 import { clearSessionData } from "../../services/session.service";
 import { routes } from "../../routes/routes";
@@ -19,6 +21,7 @@ export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [keyword, setkeyword] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -38,6 +41,20 @@ export const Header = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showUserMenu && !event.target.closest(".user-menu-container")) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -67,9 +84,6 @@ export const Header = () => {
                 alt="Rent Anything"
                 className="h-10 w-auto mr-2"
               />
-              {/* <span className="font-bold text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent hidden sm:inline-block">
-                RentAnything
-              </span> */}
             </Link>
           </div>
 
@@ -111,65 +125,98 @@ export const Header = () => {
               }}
             />
             <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors">
-              <FontAwesomeIcon icon={faMagnifyingGlass} />
+              <Search className="w-4 h-4" />
             </button>
           </div>
 
           {/* User Actions */}
-          <div className="flex items-center space-x-2">
-            {/* Wishlist and Cart - visible on all screen sizes */}
-            {user?.email && (
-              <button className="p-2 text-gray-600 hover:text-indigo-600 rounded-full hover:bg-gray-100 transition-all">
-                <FontAwesomeIcon icon={faHeart} size="lg" />
+          <div className="flex items-center space-x-4">
+            {/* Notification Bell - Only for logged in users */}
+            {/* {user?.email && (
+              <button className="relative p-2 text-gray-600 hover:text-indigo-600 rounded-full hover:bg-gray-100 transition-all">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
               </button>
-            )}
-            {/* <button className="p-2 text-gray-600 hover:text-indigo-600 rounded-full hover:bg-gray-100 transition-all">
-              <FontAwesomeIcon icon={faShoppingCart} />
-            </button> */}
+            )} */}
 
             {/* Auth Buttons */}
             {user?.email ? (
-              <div className="hidden sm:flex items-center space-x-3">
-                <div className="relative group">
-                  <button className="flex items-center justify-center gap-3 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:bg-gray-100 transition-all">
-                    <FontAwesomeIcon icon={faUser} className="" />
-                    <span className="hidden md:inline-block font-medium">
-                      {user.email.split("@")[0]}
-                    </span>
-                  </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 invisible group-hover:visible transition-all opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0">
-                    <Link
-                      to="/dashboard"
-                      className="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      to="/my-rentals"
-                      className="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-                    >
-                      My Rentals
-                    </Link>
-                    <Link
-                      to="/settings"
-                      className="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-                    >
-                      Settings
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </div>
-                {/* <button
-                  onClick={handleLogout}
-                  className="hidden md:block bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-full transition-all"
+              <div className="hidden sm:block user-menu-container relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center space-x-3 p-1.5 rounded-full hover:bg-gray-100 transition-all"
                 >
-                  Logout
-                </button> */}
+                  <div className="relative">
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar || "/placeholder.svg"}
+                        alt={user.name}
+                        className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white font-medium text-sm">
+                        {user.name?.charAt(0).toUpperCase() || "U"}
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium text-sm text-gray-900 leading-tight">
+                      {user.name}
+                    </span>
+                    <span className="text-xs text-gray-500 leading-tight">
+                      View profile
+                    </span>
+                  </div>
+                </button>
+
+                {/* Dropdown Menu */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg py-2 z-10 border border-gray-100">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user.email}
+                      </p>
+                    </div>
+
+                    <div className="py-1">
+                      <Link
+                        to="/dashboard"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        <LayoutDashboard className="w-4 h-4 mr-3 text-gray-500" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        to="/my-rentals"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        <Package className="w-4 h-4 mr-3 text-gray-500" />
+                        My Rentals
+                      </Link>
+                      <Link
+                        to="/settings"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        <Settings className="w-4 h-4 mr-3 text-gray-500" />
+                        Settings
+                      </Link>
+                    </div>
+
+                    <div className="py-1 border-t border-gray-100">
+                      <button
+                        onClick={handleLogout}
+                        className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                      >
+                        <LogOut className="w-4 h-4 mr-3" />
+                        Sign out
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="hidden sm:flex items-center space-x-3">
@@ -193,10 +240,11 @@ export const Header = () => {
               onClick={() => setIsOpen(!isOpen)}
               className="lg:hidden p-2 rounded-md text-gray-700 hover:text-indigo-600 hover:bg-gray-100 focus:outline-none transition-colors"
             >
-              <FontAwesomeIcon
-                icon={isOpen ? faTimes : faBars}
-                className="w-6 h-6"
-              />
+              {isOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>
@@ -218,7 +266,7 @@ export const Header = () => {
                 className="w-full py-2 pl-4 pr-10 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
               <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-indigo-600">
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
+                <Search className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -260,25 +308,56 @@ export const Header = () => {
           {/* Mobile Auth */}
           <div className="border-t border-gray-100 py-4 px-4">
             {user?.email ? (
-              <div className="space-y-2">
-                <Link
-                  to="/profile"
-                  className="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg"
-                >
-                  My Profile
-                </Link>
-                <Link
-                  to="/my-rentals"
-                  className="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg"
-                >
-                  My Rentals
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="w-full mt-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-lg"
-                >
-                  Logout
-                </button>
+              <div>
+                {/* Mobile User Profile Summary */}
+                <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg mb-3">
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar || "/placeholder.svg"}
+                      alt={user.name}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white font-medium">
+                      {user.name?.charAt(0).toUpperCase() || "U"}
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-medium text-gray-900">{user.name}</p>
+                    <p className="text-xs text-gray-500">{user.email}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-3 text-gray-500" />
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/my-rentals"
+                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg"
+                  >
+                    <Package className="w-4 h-4 mr-3 text-gray-500" />
+                    My Rentals
+                  </Link>
+                  <Link
+                    to="/settings"
+                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg"
+                  >
+                    <Settings className="w-4 h-4 mr-3 text-gray-500" />
+                    Settings
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center mt-2 bg-red-50 text-red-600 font-medium py-2 px-4 rounded-lg hover:bg-red-100 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="flex flex-col space-y-2">

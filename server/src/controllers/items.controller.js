@@ -173,6 +173,7 @@ export const searchItems = async (req, res) => {
       endDate,
       keyword,
       includeUnavailableItems,
+      page,
     } = req.query;
 
     const avgRating = await Review.aggregate([
@@ -249,7 +250,10 @@ export const searchItems = async (req, res) => {
       });
     }
 
-    let dbQuery = Item.find(query).populate("ownerId", "name email");
+    let dbQuery = Item.find(query)
+      .populate("ownerId", "name email")
+      .skip((page - 1) * 7)
+      .limit(7);
 
     if (sortBy) {
       switch (sortBy) {
