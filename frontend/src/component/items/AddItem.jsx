@@ -149,14 +149,7 @@ export default function AddItem() {
   ];
 
   // Condition options
-  const conditionOptions = [
-    "Brand New",
-    "Like New",
-    "Excellent",
-    "Good",
-    "Fair",
-    "Acceptable",
-  ];
+  const conditionOptions = ["Brand New", "Excellent", "Good", "Fair"];
 
   // Handle input change
   const handleChange = (e) => {

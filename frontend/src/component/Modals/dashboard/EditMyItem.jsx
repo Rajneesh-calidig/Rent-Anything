@@ -145,14 +145,7 @@ const EditMyItem = ({
     });
   }, []);
 
-  const conditionOptions = [
-    "Brand New",
-    "Like New",
-    "Excellent",
-    "Good",
-    "Fair",
-    "Acceptable",
-  ];
+  const conditionOptions = ["Brand New", "Excellent", "Good", "Fair"];
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
@@ -360,8 +353,7 @@ const EditMyItem = ({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Condition
                 </label>
-                <input
-                  type="text"
+                <select
                   name="condition"
                   value={editItemData.condition}
                   onChange={(e) =>
@@ -371,7 +363,12 @@ const EditMyItem = ({
                     })
                   }
                   className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                />
+                >
+                  <option value="">Select Condition </option>
+                  {conditionOptions?.map((condition, index) => (
+                    <option value={condition}>{condition}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">

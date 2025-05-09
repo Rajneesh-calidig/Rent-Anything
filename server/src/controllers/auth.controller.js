@@ -9,6 +9,7 @@ import {
   findUserByMobile,
 } from "../services/auth.service.js";
 import httpStatus from "../utils/httpStatus.js";
+import { nameInitialUppercase } from "../utils/nameUtils.js";
 // import { logger } from "../config/logger/logger.js";
 
 export async function signup(req, res) {
@@ -42,8 +43,14 @@ export async function signup(req, res) {
         .status(httpStatus.BAD_REQUEST)
         .json({ success: false, message: "Email already exists" });
     }
+    const formattedName = nameInitialUppercase(name);
 
-    const newUser = await createUser(email, password, name, mobileNumber);
+    const newUser = await createUser(
+      email,
+      password,
+      formattedName,
+      mobileNumber
+    );
 
     generateTokenAndSetCookie(newUser._id, res);
 
@@ -144,7 +151,7 @@ export async function login(req, res) {
 
 export async function logout(req, res) {
   try {
-    // console.log("incoming cookies, => ", req.cookies);
+    console.log("incoming cookies, => ", req.cookies);
     res.clearCookie("jwt-user", {
       httpOnly: true,
       sameSite: "none",

@@ -42,7 +42,6 @@ export const Header = () => {
     };
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showUserMenu && !event.target.closest(".user-menu-container")) {
@@ -60,6 +59,7 @@ export const Header = () => {
     e.preventDefault();
     try {
       const response = await logout();
+      setShowUserMenu(false);
       toast.success("Logged out successfully!");
     } catch (err) {
       console.error(err);
@@ -186,11 +186,12 @@ export const Header = () => {
                       <Link
                         to="/dashboard"
                         className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setShowUserMenu(false)}
                       >
                         <LayoutDashboard className="w-4 h-4 mr-3 text-gray-500" />
                         Dashboard
                       </Link>
-                      <Link
+                      {/* <Link
                         to="/my-rentals"
                         className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                       >
@@ -203,7 +204,7 @@ export const Header = () => {
                       >
                         <Settings className="w-4 h-4 mr-3 text-gray-500" />
                         Settings
-                      </Link>
+                      </Link> */}
                     </div>
 
                     <div className="py-1 border-t border-gray-100">
@@ -258,7 +259,7 @@ export const Header = () => {
       >
         <div className="bg-white shadow-lg rounded-b-lg mx-4 mt-2">
           {/* Mobile Search */}
-          <div className="p-4 border-b border-gray-100">
+          {/* <div className="p-4 border-b border-gray-100">
             <div className="relative">
               <input
                 type="text"
@@ -269,7 +270,7 @@ export const Header = () => {
                 <Search className="w-4 h-4" />
               </button>
             </div>
-          </div>
+          </div> */}
 
           {/* Mobile Navigation */}
           <nav className="py-2">
@@ -285,97 +286,27 @@ export const Header = () => {
             >
               About
             </Link>
-            <Link
+            {/* <Link
               to="/categories"
               className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium"
             >
               Categories
-            </Link>
+            </Link> */}
             <Link
               to="/blog"
               className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium"
             >
               Blog
             </Link>
-            <Link
+            {/* <Link
               to="/support"
               className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 font-medium"
             >
               Support
-            </Link>
+            </Link> */}
           </nav>
 
           {/* Mobile Auth */}
-          <div className="border-t border-gray-100 py-4 px-4">
-            {user?.email ? (
-              <div>
-                {/* Mobile User Profile Summary */}
-                <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg mb-3">
-                  {user.avatar ? (
-                    <img
-                      src={user.avatar || "/placeholder.svg"}
-                      alt={user.name}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white font-medium">
-                      {user.name?.charAt(0).toUpperCase() || "U"}
-                    </div>
-                  )}
-                  <div>
-                    <p className="font-medium text-gray-900">{user.name}</p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Link
-                    to="/dashboard"
-                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg"
-                  >
-                    <LayoutDashboard className="w-4 h-4 mr-3 text-gray-500" />
-                    Dashboard
-                  </Link>
-                  <Link
-                    to="/my-rentals"
-                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg"
-                  >
-                    <Package className="w-4 h-4 mr-3 text-gray-500" />
-                    My Rentals
-                  </Link>
-                  <Link
-                    to="/settings"
-                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg"
-                  >
-                    <Settings className="w-4 h-4 mr-3 text-gray-500" />
-                    Settings
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center justify-center mt-2 bg-red-50 text-red-600 font-medium py-2 px-4 rounded-lg hover:bg-red-100 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col space-y-2">
-                <Link
-                  to="/signin"
-                  className="text-center py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/signup"
-                  className="text-center py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium rounded-lg"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </header>

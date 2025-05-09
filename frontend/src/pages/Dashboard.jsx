@@ -23,8 +23,9 @@ import UserSettings from "../component/dashboard/Settings";
 import MyOrders from "../component/dashboard/MyOrders";
 import Transactions from "../component/dashboard/Transactions";
 import EditMyItem from "../component/Modals/dashboard/EditMyItem";
-import { formatTime } from "../utils/date-utils";
-import { differenceInMinutes } from "date-fns";
+import { formatTime, formatDate } from "../utils/date-utils";
+import { routes } from "../routes/routes";
+// import { differenceInMinutes, formatDate } from "date-fns";
 
 export default function Dashboard() {
   // State for active section
@@ -33,8 +34,10 @@ export default function Dashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    setActiveSidebarItem(sessionStorage.getItem("activeSidebarItem"));
-    setActiveSection(sessionStorage.getItem("activeSidebarItem"));
+    setActiveSidebarItem(
+      sessionStorage.getItem("activeSidebarItem") || "overview"
+    );
+    setActiveSection(sessionStorage.getItem("activeSidebarItem") || "overview");
   }, []);
 
   const navigate = useNavigate();
@@ -62,6 +65,18 @@ export default function Dashboard() {
   const [newImages, setNewImages] = useState([]);
   const [imagesToDelete, setImagesToDelete] = useState([]);
 
+  const { logout } = useAuth();
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await logout();
+      toast.success("Logged out successfully!");
+    } catch (err) {
+      console.error(err);
+    }
+    clearSessionData();
+    navigate(routes.landing);
+  };
   const handleRenderSection = () => {
     switch (activeSection) {
       case "overview":
@@ -160,10 +175,7 @@ export default function Dashboard() {
               <div className="ml-3">
                 <p className="font-medium text-gray-800">{user.name}</p>
                 <p className="text-xs text-gray-500">
-                  Member since{" "}
-                  {formatTime(
-                    differenceInMinutes(new Date(), new Date(user.createdAt))
-                  )}
+                  Member since {user?.createdAt && formatDate(user.createdAt)}
                 </p>
               </div>
             </div>
@@ -352,7 +364,10 @@ export default function Dashboard() {
 
           {/* Logout */}
           <div className="p-4 border-t">
-            <button className="flex items-center w-full px-3 py-2 text-red-600 rounded-lg hover:bg-red-50">
+            <button
+              className="flex items-center w-full px-3 py-2 text-red-600 rounded-lg hover:bg-red-50"
+              onClick={handleLogout}
+            >
               <LogOut size={18} className="mr-3" />
               Logout
             </button>
