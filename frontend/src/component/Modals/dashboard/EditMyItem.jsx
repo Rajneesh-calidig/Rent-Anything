@@ -1,38 +1,24 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Camera,
   Sofa,
   Dumbbell,
   Wrench,
-  Music,
-  Laptop,
   Car,
   Shirt,
   BookOpen,
-  Utensils,
   Tent,
-  Gamepad,
   Plus,
   X,
   Upload,
-  ChevronDown,
   FileQuestion,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useItem } from "../../../providers/Items/ItemProvider";
 import { useLoader } from "../../../providers/Loader/LoaderProvider";
 
-const EditMyItem = ({
-  setShowEditModal,
-  editItemData,
-  setEditItemData,
-  newImages,
-  setEditItemId,
-  setNewImages,
-  setImagesToDelete,
-  imagesToDelete,
-}) => {
-  const [activeImageTab, setActiveImageTab] = useState(0);
+const EditMyItem = ({ setShowEditModal, editItemData, setEditItemData }) => {
   const [imagePreview, setImagePreview] = useState([...editItemData?.images]);
   const [categoryIndex, setCategoryIndex] = useState();
   const categories = [
@@ -147,6 +133,10 @@ const EditMyItem = ({
 
   const conditionOptions = ["Brand New", "Excellent", "Good", "Fair"];
 
+  const [fileMap, setFileMap] = useState();
+  const [urlMap, setUrlMap] = useState();
+  const [thumbnailFrom, setThumbnailFrom] = useState();
+  const [selectedThumbnail, setSelectedThumbnail] = useState(0);
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
@@ -159,14 +149,100 @@ const EditMyItem = ({
           ? [...editItemData?.itemsImages, ...newFiles]
           : [...newFiles],
       });
+      const updatedFiles = editItemData?.itemsImages
+        ? [...editItemData.itemsImages, ...newFiles]
+        : [...newFiles];
+      const updatedPreviews = [...imagePreview, ...newPreviews];
+      setFileMap(
+        updatedFiles.reduce((acc, item, index) => {
+          acc[index] = item;
+          return acc;
+        }, {})
+      );
+      let count = 0;
+      setUrlMap(
+        updatedPreviews.reduce((acc, item, index) => {
+          if (item[0] === "b") {
+            acc[item] = index - count;
+          } else {
+            count++;
+          }
+          return acc;
+        }, {})
+      );
     }
   };
+
+  const handleThumbnailSelection = (imageUrl, index) => {
+    const itemDataCopy = {
+      ...editItemData,
+      images: [...editItemData.images],
+      itemsImages: editItemData.itemsImages
+        ? [...editItemData.itemsImages]
+        : [],
+    };
+    if (imageUrl[0] === "/") {
+      const oldImageIndex = editItemData.images.indexOf(imageUrl);
+      if (oldImageIndex !== 0) {
+        [itemDataCopy.images[0], itemDataCopy.images[oldImageIndex]] = [
+          itemDataCopy.images[oldImageIndex],
+          itemDataCopy.images[0],
+        ];
+      }
+      let previewCopy = [...imagePreview];
+      [previewCopy[0], previewCopy[index]] = [
+        previewCopy[index],
+        previewCopy[0],
+      ];
+      setImagePreview(previewCopy);
+      setThumbnailFrom("old");
+    } else {
+      const imageUrlIndex = urlMap[imageUrl];
+      const imageFileName = fileMap[imageUrlIndex].name;
+      let fileIndex = -1;
+      for (const file of itemDataCopy.itemsImages) {
+        fileIndex++;
+        if (file.name === imageFileName) {
+          break;
+        }
+      }
+      [itemDataCopy.itemsImages[0], itemDataCopy.itemsImages[fileIndex]] = [
+        itemDataCopy.itemsImages[fileIndex],
+        itemDataCopy.itemsImages[0],
+      ];
+
+      let previewCopy = [...imagePreview];
+
+      [previewCopy[0], previewCopy[index]] = [
+        previewCopy[index],
+        previewCopy[0],
+      ];
+      // console.log("imagepreview", imagePreview[0]);
+      if (imagePreview[0][0] === "/") {
+        let temp = [];
+        for (const preview of previewCopy) {
+          if (preview[0] === "/") {
+            temp.push(preview);
+          }
+        }
+        itemDataCopy.images = [...temp];
+      }
+      setImagePreview(previewCopy);
+      setThumbnailFrom("new");
+      //Todo - after getting fileIndex I can use this index at which the file is located in itemsImages and then swap it with the first position also this might break if the file has same name
+    }
+    setEditItemData(itemDataCopy);
+  };
+
+  useEffect(() => {
+    console.log("item data edit", editItemData);
+  }, [editItemData]);
 
   const { deleteImage, updateItem } = useItem();
   const loader = useLoader();
   const handleRemoveImage = async (index, isNew = false) => {
     const name = imagePreview[index];
-    if (name[0] === "/") {
+    if (name[0] === "h") {
       try {
         loader.start();
         const res = await deleteImage(name, editItemData._id);
@@ -197,54 +273,57 @@ const EditMyItem = ({
     }
   };
 
-  const handleSaveEdit = async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-
-    Object.keys(editItemData).forEach((key) => {
-      if (key !== "images") {
-        formData.append(key, editItemData[key]);
-      }
-    });
-
-    formData.append("existingImages", JSON.stringify(editItemData.images));
-
-    formData.append("imagesToDelete", JSON.stringify(imagesToDelete));
-
-    newImages.forEach((image, index) => {
-      formData.append(`newImage${index}`, image.file);
-    });
-
-    setShowEditModal(false);
-    setEditItemId(null);
-  };
-
-  // const { updateItem } = useItem();
   const handleUpdateItem = async (e) => {
     e.preventDefault();
     try {
       loader.start();
-      console.log(editItemData);
-      const formData = new FormData();
+      const files = editItemData.itemsImages || [];
+      const uploadPromises = files.map(async (file, index) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "hackathon3");
+        formData.append("folder", "item/images");
 
-      for (const key in editItemData) {
-        if (key === "itemsImages") {
-          editItemData.itemsImages.forEach((image) => {
-            formData.append("itemsImages", image);
-          });
-        } else if (
-          key === "_id" ||
-          key === "createdAt" ||
-          key === "updatedAt"
-        ) {
-          continue;
-        } else {
-          formData.append(key, editItemData[key]);
-        }
-      }
-      console.log(formData);
-      const response = await updateItem(editItemData._id, formData);
+        const res = await axios.post(
+          "https://api.cloudinary.com/v1_1/diexwvrnq/image/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        return res.data;
+      });
+      const uploadedImages = await Promise.all(uploadPromises);
+      const imageUrls = uploadedImages.map((image) => image.secure_url);
+
+      const data = {
+        ...editItemData,
+        images: [...editItemData.images, ...imageUrls],
+      };
+
+      // for (const key in editItemData) {
+      //   if (key === "itemsImages") {
+      //     editItemData.itemsImages.forEach((image) => {
+      //       formData.append("itemsImages", image);
+      //     });
+      //   } else if (
+      //     key === "_id" ||
+      //     key === "createdAt" ||
+      //     key === "updatedAt"
+      //   ) {
+      //     continue;
+      //   } else {
+      //     formData.append(key, editItemData[key]);
+      //   }
+      // }
+      // if (thumbnailFrom) {
+      //   formData.append("thumbnailFrom", thumbnailFrom);
+      // }
+      // console.log(formData);
+      const response = await updateItem(editItemData._id, data);
       if (response.status === 200) {
         toast.success("Updated Successfully!");
         setShowEditModal(false);
@@ -252,11 +331,12 @@ const EditMyItem = ({
       }
     } catch (err) {
       console.error(err);
-      toast.error(err.response.data);
+      toast.error(err);
     } finally {
       loader.stop();
     }
   };
+
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -475,13 +555,12 @@ const EditMyItem = ({
 
             {/* Image Management Section */}
             <div className="mt-8">
-              <h3 className="text-lg font-medium text-gray-800 mb-4">
-                Manage Images
-              </h3>
-
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-gray-700 mb-4">
                   Images
+                  <span className="ml-1 text-sm text-gray-600 font-medium">
+                    (Click on an image to select it as thumbnail)
+                  </span>
                 </h2>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                   <input
@@ -496,16 +575,24 @@ const EditMyItem = ({
                   {imagePreview.length > 0 ? (
                     <div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4">
-                        {imagePreview.map((src, index) => (
+                        {imagePreview?.map((src, index) => (
                           <div key={index} className="relative group">
                             <img
-                              src={
-                                src[0] === "/"
-                                  ? `${import.meta.env.VITE_FILE_URL}${src}`
-                                  : src
-                              }
+                              src={src}
                               alt={`Preview ${index + 1}`}
-                              className="w-full h-24 object-cover rounded-lg"
+                              className={`w-full h-24 object-cover rounded-lg ${
+                                selectedThumbnail === index
+                                  ? "ring-2 ring-blue-500 scale-105 shadow-lg"
+                                  : "hover:shadow-md"
+                              }`}
+                              // className={`relative group cursor-pointer transition-all duration-200 ${
+                              //   selectedThumbnail === index
+                              //     ? "ring-4 ring-blue-500 scale-105 shadow-lg"
+                              //     : "hover:shadow-md"
+                              // }`}
+                              onClick={(e) =>
+                                handleThumbnailSelection(src, index, e)
+                              }
                             />
                             <button
                               type="button"

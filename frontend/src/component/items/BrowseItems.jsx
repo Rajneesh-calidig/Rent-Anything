@@ -334,7 +334,9 @@ export default function BrowseItems() {
                   <CustomSlider
                     min={0}
                     max={5000}
-                    value={filters.minPrice || 500}
+                    value={
+                      filters.minPrice || searchParams.get("minPrice") || 0
+                    }
                     onChange={handleSliderChange}
                     label="Min Price"
                     name="minPrice"
@@ -343,7 +345,9 @@ export default function BrowseItems() {
                   <CustomSlider
                     min={0}
                     max={10000}
-                    value={filters.maxPrice || 2800}
+                    value={
+                      filters.maxPrice || searchParams.get("maxPrice") || 20000
+                    }
                     onChange={handleSliderChange}
                     label="Max Price"
                     name="maxPrice"

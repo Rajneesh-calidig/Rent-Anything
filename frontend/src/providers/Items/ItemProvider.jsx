@@ -89,11 +89,7 @@ export const ItemProvider = ({ children }) => {
   const addItem = useCallback(
     async (data) => {
       try {
-        const response = await api.post("/items", data, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        const response = await api.post("/items", data);
         setItems((prev) => [...prev, response.data]);
         return response;
       } catch (err) {
@@ -107,11 +103,7 @@ export const ItemProvider = ({ children }) => {
   const updateItem = useCallback(
     async (id, data) => {
       try {
-        const response = await api.put(`/items/${id}`, data, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        const response = await api.put(`/items/${id}`, data);
         setItems((prev) =>
           prev.map((item) => (item._id === id ? response.data : item))
         );

@@ -3,8 +3,11 @@ import { Upload, Edit, Clock, CheckCircle, Cross } from "lucide-react";
 import { useUser } from "../../providers/User/UserProvider";
 import { toast } from "react-toastify";
 import { useLoader } from "../../providers/Loader/LoaderProvider";
+import axios from "axios";
+import { useAuth } from "../../providers/Auth/AuthProvider";
 
 const Profile = ({ user, previewImage, setPreviewImage }) => {
+  const { updateUser } = useAuth();
   const { updateProfile, updateDetails, updatePassword, applyKYC, isLoading } =
     useUser();
   const [aadhaarPreview, setAadhaarPreview] = useState(null);
@@ -55,14 +58,29 @@ const Profile = ({ user, previewImage, setPreviewImage }) => {
 
   const handleUpdateProfileImage = async (e) => {
     e.preventDefault();
-
+    const file = e.target.files[0];
     const formData = new FormData();
-    formData.append("profileImage", e.target.files[0]);
+    formData.append("file", file);
+    formData.append("upload_preset", "hackathon");
+    formData.append("folder", "user/profile");
     try {
-      await updateProfile(user._id, formData);
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/diexwvrnq/image/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      // const data = await res.json();
+      // console.log(res);
+
+      await updateProfile(user._id, res.data.secure_url);
+      setPreviewImage(res.data.secure_url);
       toast.success("Profile image updated successfully!");
     } catch (err) {
+      console.error(err);
       toast.error("Error updating profile image");
     }
   };
@@ -86,17 +104,57 @@ const Profile = ({ user, previewImage, setPreviewImage }) => {
 
   const handleSubmitKYC = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("aadhaarCardImage", kycInfo.aadhaarCardImage);
-    formData.append("panCardImage", kycInfo.panCardImage);
-    formData.append("aadhaarCardNumber", kycInfo.aadhaarCardNumber);
-    formData.append("panCardNumber", kycInfo.panCardNumber);
+    // const formData = new FormData();
+    // formData.append("aadhaarCardImage", kycInfo.aadhaarCardImage);
+    // formData.append("panCardImage", kycInfo.panCardImage);
+    // formData.append("aadhaarCardNumber", kycInfo.aadhaarCardNumber);
+    // formData.append("panCardNumber", kycInfo.panCardNumber);
+
+    const files = [kycInfo.aadhaarCardImage, kycInfo.panCardImage];
 
     try {
-      const response = await applyKYC(user._id, formData);
+      const uploadPromises = files.map(async (file, index) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        // Choose correct preset and folder based on index
+        if (index === 0) {
+          formData.append("upload_preset", "hackathon1");
+          formData.append("folder", "user/aadhaarImages");
+        } else {
+          formData.append("upload_preset", "hackathon2");
+          formData.append("folder", "user/panImages");
+        }
+
+        const res = await axios.post(
+          "https://api.cloudinary.com/v1_1/diexwvrnq/image/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        return res.data;
+      });
+
+      const uploadedImages = await Promise.all(uploadPromises);
+      // console.log("upuploadedImages);
+      const imageUrls = uploadedImages.map((img) => img.secure_url);
+
+      // console.log('uploaded urls: ',imageUrls)
+
+      const response = await applyKYC(user._id, {
+        aadhaarCardImage: imageUrls[0],
+        panCardImage: imageUrls[1],
+        aadhaarCardNumber: kycInfo.aadhaarCardNumber,
+        panCardNumber: kycInfo.panCardNumber,
+      });
       updateUser(response.data.user);
       toast.success("KYC submitted successfully!");
     } catch (err) {
+      console.error(err);
       toast.error("Error submitting KYC");
     }
   };
@@ -126,11 +184,7 @@ const Profile = ({ user, previewImage, setPreviewImage }) => {
         <div className="flex flex-col md:flex-row md:items-center">
           <div className="relative mb-6 md:mb-0 md:mr-8">
             <img
-              src={
-                previewImage ||
-                `${import.meta.env.VITE_FILE_URL}${user.profileImage}` ||
-                "/placeholder.svg"
-              }
+              src={previewImage || user.profileImage || "/placeholder.svg"}
               alt="Profile"
               className="w-24 h-24 rounded-full object-cover border-4 border-indigo-100"
             />

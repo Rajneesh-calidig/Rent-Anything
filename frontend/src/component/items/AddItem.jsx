@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import {
   Camera,
   Sofa,
@@ -20,6 +21,11 @@ import {
 } from "lucide-react";
 import { useItem } from "../../providers/Items/ItemProvider";
 import { toast } from "react-toastify";
+import {
+  LoaderProvider,
+  useLoader,
+} from "../../providers/Loader/LoaderProvider";
+import { useAuth } from "../../providers/Auth/AuthProvider";
 
 export default function AddItem() {
   // State for form data
@@ -42,7 +48,8 @@ export default function AddItem() {
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
-  const { addItem } = useItem();
+  const { addItem, getMyItems } = useItem();
+  const { user } = useAuth();
 
   const categories = [
     {
@@ -262,6 +269,7 @@ export default function AddItem() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const loader = useLoader();
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -274,20 +282,29 @@ export default function AddItem() {
       return;
     }
     try {
-      const data = new FormData();
+      loader.start();
+      const files = formData.images || [];
+      const uploadPromises = files.map(async (file, index) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "hackathon3");
+        formData.append("folder", "item/images");
+        const res = await axios.post(
+          "https://api.cloudinary.com/v1_1/diexwvrnq/image/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
-      console.log(formData);
-      // Append all fields to FormData
-      for (const key in formData) {
-        if (key === "images") {
-          formData.images.forEach((image) => {
-            data.append("itemsImages", image); // 'itemsImages' matches the multer field name
-          });
-        } else {
-          data.append(key, formData[key]);
-        }
-      }
-
+        return res.data;
+      });
+      const uploadedImages = await Promise.all(uploadPromises);
+      console.log(uploadedImages);
+      const imageUrls = uploadedImages.map((image) => image.secure_url);
+      const data = { ...formData, images: imageUrls };
       // Send data to backend
       const response = await addItem(data);
 
@@ -296,10 +313,8 @@ export default function AddItem() {
       // if (!response.ok) {
       //   throw new Error(result.message || "Failed to create item");
       // }
-
       toast.success("Item added successfully!");
-
-      // Reset form
+      await getMyItems(user._id);
       setFormData({
         title: "",
         description: "",
@@ -317,9 +332,13 @@ export default function AddItem() {
       });
       setImagePreview([]);
       setSubcategories([]);
+
+      // Reset form
     } catch (error) {
       console.error("Error creating item:", error.message);
       toast.error("Error creating item: " + error.message);
+    } finally {
+      loader.stop();
     }
   };
 

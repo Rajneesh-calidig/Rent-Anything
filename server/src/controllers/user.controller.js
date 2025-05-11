@@ -1,13 +1,11 @@
 import User from "../models/User.js";
-import fs from "fs";
 import httpStatus from "../utils/httpStatus.js";
-import { fileURLToPath } from "url";
 import bcrypt from "bcrypt";
-import path from "path";
 
 export const updateUserProfile = async (req, res) => {
   try {
     const userId = req.params.id;
+    const { cloudinaryUrl } = req.body;
 
     const user = await User.findById(userId);
 
@@ -15,25 +13,7 @@ export const updateUserProfile = async (req, res) => {
       return res.status(404).json({ error: "User Not Found!" });
     }
 
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-
-    // Delete old image if already exist
-    if (req.file && user.profileImage) {
-      const oldImagePath = path.join(
-        __dirname,
-        "..",
-        "public/images/userProfile",
-        path.basename(user.profileImage)
-      );
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
-      }
-    }
-
-    if (req.file) {
-      user.profileImage = `/public/images/userProfile/${req.file.filename}`;
-    }
+    user.profileImage = cloudinaryUrl;
 
     await user.save();
 
@@ -111,20 +91,8 @@ export const applyKYC = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // if (req.file) {
-    //     console.log('3')
-    //     console.log(req.file)
-    //     if (req.file.fieldname === 'aadhaarCardImage') {
-    //     user.aadhaarCardImage = `/public/images/aadhaarImages/${req.file.filename}`;
-    //     } else if (req.file.fieldname === 'panCardImage') {
-    //     user.panCardImage = `/public/images/panCardImages/${req.file.filename}`;
-    //     }
-    // }
-
-    const aadhaarCardImage = req.files["aadhaarCardImage"][0];
-    const panCardImage = req.files["panCardImage"][0];
-    user.aadhaarCardImage = `/public/images/aadhaarImages/${aadhaarCardImage.filename}`;
-    user.panCardImage = `/public/images/panCardImages/${panCardImage.filename}`;
+    user.aadhaarCardImage = req.body.aadhaarCardImage;
+    user.panCardImage = req.body.panCardImage;
 
     if (req.body.aadhaarCardNumber) {
       user.aadhaarCardNumber = req.body.aadhaarCardNumber;

@@ -14,12 +14,7 @@ import { uploadItemsImages } from "../../middleware/upload.js";
 
 const router = express.Router();
 
-router.post(
-  "/",
-  protectRoute,
-  uploadItemsImages.array("itemsImages", 5),
-  createItem
-);
+router.post("/", protectRoute, createItem);
 router.get("/", getAllItems);
 router.get("/my-items/:userId", protectRoute, getMyItems);
 router.get("/search", searchItems);

@@ -1,3 +1,4 @@
+import { deleteCloudinaryImage } from "../utils/cloudinaryDelete.js";
 import { fileURLToPath } from "url";
 import Item from "../models/item.js";
 import Rental from "../models/rental.js";
@@ -9,19 +10,16 @@ import path from "path";
 
 export const createItem = async (req, res) => {
   try {
-    if (!req.files || req.files.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "At least one image is required" });
-    }
+    // if (!req.files || req.files.length === 0) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "At least one image is required" });
+    // }
 
-    const itemsImages = req.files.map(
-      (file) => `/public/images/itemImages/${file.filename}`
-    );
+    console.log(req.body);
     const newItem = new Item({
       ...req.body,
       ownerId: req.user.userId,
-      images: itemsImages,
     });
     const savedItem = await newItem.save();
     res.status(201).json({ success: true, savedItem });
@@ -132,12 +130,33 @@ export const updateItem = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized" });
     }
     const data = req.body;
-    const newImages = req.files.map(
-      (file) => `/public/images/itemImages/${file.filename}`
-    );
-    const updatedItemData = { ...data, images: [...item.images, ...newImages] };
-    console.log(updatedItemData);
-    Object.assign(item, updatedItemData);
+
+    // const oldSortedImages = data.images.split(",");
+    // console.log(oldSortedImages);
+    // const newImages = req.files.map(
+    //   (file) => `/public/images/itemImages/${file.filename}`
+    // );
+    // let updatedItemData;
+    // if (thumbnailFrom) {
+    //   if (thumbnailFrom === "old") {
+    //     updatedItemData = {
+    //       ...data,
+    //       images: [...oldSortedImages, ...newImages],
+    //     };
+    //   } else {
+    //     updatedItemData = {
+    //       ...data,
+    //       images: [...newImages, ...oldSortedImages],
+    //     };
+    //   }
+    // } else {
+    //   updatedItemData = {
+    //     ...data,
+    //     images: [...item?.images, ...newImages],
+    //   };
+    // }
+
+    Object.assign(item, data);
     const updatedItem = await item.save();
     res.status(200).json({ data: updatedItem });
   } catch (error) {
@@ -150,7 +169,7 @@ export const deleteItem = async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
     if (!item) return res.status(404).json({ message: "Item not found" });
-    if (item.ownerId.toString() !== req.user.id) {
+    if (item.ownerId.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
     await item.deleteOne();
@@ -301,19 +320,18 @@ export const searchItems = async (req, res) => {
 export const deleteImage = async (req, res) => {
   try {
     const { imageName } = req.body;
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
 
-    const oldImagePath = path.join(
-      __dirname,
-      "..",
-      "public/images/itemImages",
-      path.basename(imageName)
-    );
-    if (fs.existsSync(oldImagePath)) {
-      fs.unlinkSync(oldImagePath);
-    }
+    const url =
+      "https://res.cloudinary.com/diexwvrnq/image/upload/v1746941308/item/images/iq1tmfdzq5bfesmvfmpd.png";
+    const afterUpload = url.split("/upload/")[1];
+    const segments = afterUpload.split("/");
+    segments.shift(); // removes version (like "v1746941308")
+    const publicIdWithExt = segments.join("/");
+    const publicId = publicIdWithExt.split(".")[0];
 
+    console.log(publicId); // "item/images/iq1tmfdzq5bfesmvfmpd"
+    const result = await deleteCloudinaryImage(publicId);
+    console.log(result);
     const { id } = req.params;
     console.log(id);
     const item = await Item.findById(id);
