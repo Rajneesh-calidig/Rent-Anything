@@ -4,7 +4,6 @@ export const formatTime = (differenceInMinutes) => {
   const months = Math.floor(days / 30);
   const weeks = Math.floor(days / 7);
   const years = Math.floor(days / 365);
-  console.log(hour, days, months, weeks, years);
 
   if (differenceInMinutes <= 1) {
     return "just now";

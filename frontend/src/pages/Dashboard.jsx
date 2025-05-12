@@ -574,7 +574,7 @@ export default function Dashboard() {
       {/* Sidebar with responsive behavior */}
       <div
         className={`transition-all duration-300 ease-in-out fixed md:sticky top-0 left-0 z-40 h-screen flex flex-col bg-white shadow-lg ${
-          sidebarOpen ? "w-64" : "w-[66px]"
+          sidebarOpen ? "w-64" : "w-[86px]"
         }`}
       >
         {/* Toggle button - visible on small screens */}

@@ -50,6 +50,10 @@ const userSchema = new Schema(
     panCardImage: {
       type: String,
     },
+    likedItems: {
+      type: [String],
+      default: [],
+    },
     kycStatus: {
       type: String,
       default: "NOT SUBMITTED",

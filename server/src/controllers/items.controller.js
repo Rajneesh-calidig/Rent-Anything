@@ -69,6 +69,35 @@ export const getAllItems = async (req, res) => {
   }
 };
 
+export const getLikedItems = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).populate("likedItems");
+    const likedItems = user.likedItems;
+    return res.status(200).json({ message: "success", data: likedItems });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+export const likeToggle = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (user.likedItems.includes(req.params.itemId)) {
+      user.likedItems = user.likedItems.filter(
+        (item) => item.toString() !== req.params.itemId
+      );
+    } else {
+      user.likedItems.push(req.params.itemId);
+    }
+    await user.save();
+    return res.status(200).json({ message: "success" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: err.message });
+  }
+};
+
 export const getItemById = async (req, res) => {
   try {
     const item = await Item.findById(req.params.id).populate(

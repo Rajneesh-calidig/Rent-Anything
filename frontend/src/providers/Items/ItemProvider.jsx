@@ -12,6 +12,8 @@ const ItemContext = React.createContext({
   fetchItems: async () => {},
   fetchReviews: async () => {},
   getItem: async () => {},
+  likeItem: async () => {},
+  getLikedItems: async () => {},
   addItem: async () => {},
   updateItem: async () => {},
   deleteItem: async () => {},
@@ -80,6 +82,37 @@ export const ItemProvider = ({ children }) => {
         return response;
       } catch (err) {
         console.error(`Failed to get items for user with id ${userId}:`, err);
+        return Promise.reject(err);
+      }
+    },
+    [api]
+  );
+
+  const likeItem = useCallback(
+    async (itemId, userId) => {
+      try {
+        const response = await api.post(
+          `/items/liked-items/${itemId}/${userId}`
+        );
+        return response;
+      } catch (err) {
+        console.error(`Failed to like item with id ${itemId}:`, err);
+        return Promise.reject(err);
+      }
+    },
+    [api]
+  );
+
+  const getLikedItems = useCallback(
+    async (itemId, userId) => {
+      try {
+        const response = await api.get(`/items/liked-items/${userId}`);
+        return response;
+      } catch (err) {
+        console.error(
+          `Failed to get liked items for user with id ${userId}:`,
+          err
+        );
         return Promise.reject(err);
       }
     },
@@ -201,6 +234,8 @@ export const ItemProvider = ({ children }) => {
         fetchItems,
         fetchReviews,
         getItem,
+        likeItem,
+        getLikedItems,
         addItem,
         updateItem,
         deleteItem,

@@ -9,6 +9,8 @@ import {
   searchItems,
   getMyItems,
   deleteImage,
+  getLikedItems,
+  likeToggle,
 } from "../../controllers/items.controller.js";
 import { uploadItemsImages } from "../../middleware/upload.js";
 
@@ -16,6 +18,8 @@ const router = express.Router();
 
 router.post("/", protectRoute, createItem);
 router.get("/", getAllItems);
+router.get("/liked-items/:userId", protectRoute, getLikedItems);
+router.post("/liked-items/:itemId/:userId", protectRoute, likeToggle);
 router.get("/my-items/:userId", protectRoute, getMyItems);
 router.get("/search", searchItems);
 router.get("/:id", getItemById);

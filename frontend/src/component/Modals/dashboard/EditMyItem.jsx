@@ -304,25 +304,6 @@ const EditMyItem = ({ setShowEditModal, editItemData, setEditItemData }) => {
         images: [...editItemData.images, ...imageUrls],
       };
 
-      // for (const key in editItemData) {
-      //   if (key === "itemsImages") {
-      //     editItemData.itemsImages.forEach((image) => {
-      //       formData.append("itemsImages", image);
-      //     });
-      //   } else if (
-      //     key === "_id" ||
-      //     key === "createdAt" ||
-      //     key === "updatedAt"
-      //   ) {
-      //     continue;
-      //   } else {
-      //     formData.append(key, editItemData[key]);
-      //   }
-      // }
-      // if (thumbnailFrom) {
-      //   formData.append("thumbnailFrom", thumbnailFrom);
-      // }
-      // console.log(formData);
       const response = await updateItem(editItemData._id, data);
       if (response.status === 200) {
         toast.success("Updated Successfully!");
@@ -335,6 +316,38 @@ const EditMyItem = ({ setShowEditModal, editItemData, setEditItemData }) => {
     } finally {
       loader.stop();
     }
+  };
+  const [draggedItemIndex, setDraggedItemIndex] = useState();
+  const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
+  const handleDragStart = (index, e) => {
+    setDraggedItemIndex(index);
+    // setCoordinates({ x: e.clientX, y: e.clientY });
+    console.log(e.clientX, e.clientY);
+    // console.log(e.dataTransfer);
+    // e.dataTransfer.setData("text/plain", index);
+    // e.dataTransfer.effectAllowed = "move";
+    // e.dataTransfer.setDragImage(e.target, 0, 0);
+    // e.target.style.opacity = "0.5";
+    // e.target.style.transform = "scale(1.1)";
+    // e.target.style.transition = "transform 0.2s ease";
+    // e.target.style.zIndex = "1000";
+    // e.target.style.position = "absolute";
+    // e.target.style.left = `${e.clientX}px - 50%`;
+    // e.target.style.top = `${e.clientY}px - 50%`;
+    // e.target.style.pointerEvents = "none";
+  };
+  const handleDrop = (event, targetIndex) => {
+    if (draggedItemIndex === null) {
+      return;
+    }
+
+    const newItems = [...editItemData.images];
+    const [draggedItem] = newItems.splice(draggedItemIndex, 1);
+    newItems.splice(targetIndex, 0, draggedItem);
+
+    setEditItemData({ ...editItemData, images: newItems });
+    setImagePreview(newItems);
+    setDraggedItemIndex(null);
   };
 
   return (
@@ -574,9 +587,20 @@ const EditMyItem = ({ setShowEditModal, editItemData, setEditItemData }) => {
 
                   {imagePreview.length > 0 ? (
                     <div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4 transition-all duration-1000">
                         {imagePreview?.map((src, index) => (
-                          <div key={index} className="relative group">
+                          <div
+                            key={index}
+                            // onDragEnd={() => console.log("drag")}
+                            draggable
+                            onDrag={(e) => handleDragStart(index, e)}
+                            // ondrag
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={(e) => handleDrop(e, index)}
+                            className={`relative group ${
+                              draggedItemIndex === index && ``
+                            }`}
+                          >
                             <img
                               src={src}
                               alt={`Preview ${index + 1}`}
@@ -585,11 +609,7 @@ const EditMyItem = ({ setShowEditModal, editItemData, setEditItemData }) => {
                                   ? "ring-2 ring-blue-500 scale-105 shadow-lg"
                                   : "hover:shadow-md"
                               }`}
-                              // className={`relative group cursor-pointer transition-all duration-200 ${
-                              //   selectedThumbnail === index
-                              //     ? "ring-4 ring-blue-500 scale-105 shadow-lg"
-                              //     : "hover:shadow-md"
-                              // }`}
+                              // onDoubleClick={() => alert("double clicked")}
                               onClick={(e) =>
                                 handleThumbnailSelection(src, index, e)
                               }

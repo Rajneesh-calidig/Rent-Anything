@@ -22,7 +22,7 @@ import RazorpayButton from "../payment/payment";
 import { useLoader } from "../../providers/Loader/LoaderProvider";
 
 export default function BookItem() {
-  const { getItem } = useItem();
+  const { getItem, likeItem } = useItem();
   const { id } = useParams();
   const { user } = useAuth();
   // const { navigate } = useNavigate();
@@ -34,7 +34,6 @@ export default function BookItem() {
       try {
         loader.start();
         const item = await getItem(id);
-        console.log(item);
         setProduct(item);
       } catch (err) {
         console.error(err);
@@ -56,7 +55,10 @@ export default function BookItem() {
   const [endDate, setEndDate] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(product?.pricePerDay);
-  const [isFavorite, setIsFavorite] = useState(true);
+  const [isFavorite, setIsFavorite] = useState();
+  useEffect(() => {
+    setIsFavorite(user?.likedItems?.includes(product?._id));
+  }, [user]);
   const [reviewDetails, setReviewDetails] = useState({
     rating: 0,
     comment: "",
@@ -120,6 +122,25 @@ export default function BookItem() {
     setZoomPosition({ x, y });
   };
 
+  //Handle like item
+  const handleLikeToggle = async () => {
+    try {
+      loader.start();
+      const response = await likeItem(product?._id, user?._id);
+      if (response.status === 200) {
+        setIsFavorite(!isFavorite);
+        toast.success(
+          isFavorite ? "Removed from favorites" : "Added to favorites"
+        );
+      }
+    } catch (err) {
+      console.error("Error liking item: ", err);
+      toast.error("Failed to like item");
+    } finally {
+      loader.stop();
+    }
+  };
+
   // Custom star rating component
   const StarRating = ({ rating, size = 16 }) => {
     return (
@@ -175,13 +196,10 @@ export default function BookItem() {
           new Date(),
           new Date(review.createdAt)
         );
-        console.log(timeDifference);
         const formattedTime = formatTime(timeDifference);
         return { ...review, date: formattedTime };
       });
-      console.log(updatedReviews);
       setReviews(updatedReviews);
-      // console.log(reviews)
     };
     if (product?._id) {
       fetchReviews();
@@ -194,7 +212,6 @@ export default function BookItem() {
         ...reviewDetails,
         itemId: product?._id,
       });
-      console.log("submit ->< ", response);
       if (response.status === 200) {
         toast.success("Review submitted successfully!");
         const updatedReview = {
@@ -339,16 +356,16 @@ export default function BookItem() {
                       ? "bg-red-100 text-red-500"
                       : "bg-gray-100 text-gray-500"
                   } hover:bg-gray-200 transition-colors`}
-                  onClick={() => setIsFavorite(!isFavorite)}
+                  onClick={handleLikeToggle}
                 >
                   <Heart
                     size={20}
                     className={isFavorite ? "fill-red-500" : ""}
                   />
                 </button>
-                <button className="p-2 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">
+                {/* <button className="p-2 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">
                   <Share2 size={20} />
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -411,10 +428,6 @@ export default function BookItem() {
                     <span className="text-sm text-gray-500">
                       Member since: {formatDate(product?.ownerId?.createdAt)}
                     </span>
-                  </div>
-                  <div className="flex items-center mt-2 text-sm text-gray-600">
-                    <Clock size={14} className="mr-1" />
-                    Response time: {product?.owner?.responseTime}
                   </div>
                 </div>
               </div>
