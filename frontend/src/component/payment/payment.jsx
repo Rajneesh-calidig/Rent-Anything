@@ -29,7 +29,7 @@ const RazorpayButton = ({item,amount }) => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:4000/api/payment/create-order", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/payment/create-order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ console.log("our data is",data)
           console.log("Payment Success:", response);
           // Send response to backend for verification
           try {
-            const verifyRes = await fetch("http://localhost:4000/api/payment/verify-payment", {
+            const verifyRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/payment/verify-payment`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

@@ -1,13 +1,17 @@
 import Razorpay from 'razorpay';
 import dotenv from 'dotenv'
 import crypto from "crypto";
-import payment from "../models/payment.js"
+import Payment from "../models/payment.js"
 import User from "../models/User.js"
-
+import Stripe from "stripe"
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripeWebHookKey=process.env.STRIPE_WEBHOOK_KEY
 const instance = new Razorpay({
-  key_id: process.env.key_id,
-  key_secret:process.env.key_secret
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret:process.env.RAZORPAY_KEY_SECRET
 });
+
+const endpointSecret = stripeWebHookKey;
 
 export const createOrder= async (req, res) => {
     const { amount, itemData } = req.body;
@@ -105,25 +109,247 @@ export const verifyPayment = async (req, res) => {
 };
 
 
-export const createListerAccount=  async (req, res) => {
-  const { userId, name, email, contact } = req.body;
+export const createOrderByStripe = async (req, res) => {
   try {
-    const response = await instance.accounts.create({
-      type: "individual",
-      name,
-      email,
-      contact,
-      legal_business_name: name,
-      business_type: "individual",
-      customer_facing_business_name: `${name}'s Rentals`,
-    });
+    const { product, email } = req.body;
+    const user = await User.findOne(
+      { _id: product.ownerId._id },
+      { acc_no: 1, _id: 0 }
+    );
+    console.log("our product is",req.body)
+    
+    // const connectedAccountId = user?.acc_no?.toString()
+    // Save payment to DB
+    // const newPayment = await Payment.create({
+    //   item_id: product._id,
+    //   owner_id: product.ownerId._id,
+    //   amount: product.pricePerDay,
+    //   transfer_amount: product.pricePerDay,
+    // });
 
-    await User.findByIdAndUpdate(userId, {
-      razorpay_account_id: response.id,
-    });
+    // const session = await stripe.checkout.sessions.create({
+    //   payment_method_types: ["card"],
+    //   line_items: [
+    //     {
+    //       price_data: {
+    //         currency: "aud",
+    //         product_data: {
+    //           name: product.title,
+    //         },
+    //         unit_amount: Math.round(product.pricePerDay * 100),
+    //       },
+    //       quantity: 1,
+    //     },
+    //   ],
+    //   mode: "payment",
+    //   success_url: "http://localhost:3000/success",
+    //   cancel_url: "http://localhost:3000/cancel",
+    //   customer_email: email,
+    //   metadata: {
+    //     payment_id: newPayment._id.toString(),
+    //   },
+    //   payment_intent_data: {
+    //     application_fee_amount: Math.round(product.platformFee * 100 || 0), // Optional platform fee
+    //     transfer_data: {
+    //       destination: connectedAccountId, // Connected account ID
+    //     },
+    //   },
+    // });
 
-    res.status(200).json({ status: "success", account_id: response.id });
+    res.json({ id: session.id });
+  } catch (error) {
+    console.error("Stripe session error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+ 
+
+
+export const stripeWebhook = async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    // ✅ Use raw body here
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
-    res.status(400).send({err})
+    console.error('❌ Stripe webhook verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const email = session.customer_email;
+    const paymentIntentId = session.payment_intent;
+    const ongoingPayment=session.metadata.payment_id
+    const status=session.payment_status
+
+    try {
+     const user= await User.findOne(
+        { email }
+      );
+      const completePayment = await Payment.findOneAndUpdate(
+  { _id: ongoingPayment }, // ✅ Proper filter
+  {
+    $set: {
+      rentee_id: user._id,
+      transection_id: paymentIntentId,
+      status: status
+    }
+  },
+  { new: true } // ✅ Optional: returns updated document
+);
+    } catch (err) {
+     res.status(500).json({
+      success:false,
+      error:err.message
+     })
+    }
+  }
+
+  res.status(200).json({ received: true });
+};
+
+export const createListerAccount=async(req,res)=>{
+  const{firstName,lastName,email}=req.body
+try{
+  const account=await stripe.accounts.create({
+    type: "custom", // or 'standard'
+    country: "AU",
+    individual: {
+  
+      first_name: firstName,
+  
+      last_name: lastName,
+  
+      email: email,
+  
+      phone: "+15555555555",
+  
+      dob: {
+  
+        day: 1,
+  
+        month: 1,
+  
+        year: 1990
+  
+      }
+    },
+  
+    business_type: "individual",
+  
+    capabilities: {
+  
+      card_payments: { requested: true },
+  
+      transfers: { requested: true }
+    }, 
+    business_profile: {
+      url: "https://rajneesh-insta-clone.netlify.app/",
+      product_description: "Peer-to-peer rental marketplace for tools, electronics, and more.",
+      support_phone: "+15551234567",
+      mcc: "7399" // Miscellaneous business services
+    },
+   external_account: {
+  object: "bank_account",
+  country: "AU",
+  currency: "aud",
+  account_holder_name: `${firstName} ${lastName}`,
+  account_holder_type: "individual",
+  routing_number: "110000",  // Replace with the actual routing number
+  account_number: "000123456"  // Replace with the actual account number
+  },
+    tos_acceptance: {
+      date: Math.floor(Date.now() / 1000),
+      ip: "203.0.113.42" // e.g., '203.0.113.42'
+    },
+  
+  
+  })
+  await User.updateOne({email},{$set:{acc_no:account.id}})
+  res.status(200).json({
+    success:true,
+    account
+  })
+}
+catch(err){
+res.status(500).json({
+  success:false,
+  message:err.message
+})
 }
 }
+
+export const updateConnectedAccount=async (req,res)=> {
+
+const {accountId}=req.params
+  try {
+    const updatedAccount = await stripe.accounts.update(accountId,req.body);
+    res.status(200).json({ updatedAccount});
+  } catch (error) {
+    throw error
+  }
+}
+
+export const listerPayout=async(req,res)=>{
+  try{
+    const {email } = req.body;
+    const user = await User.findOne(
+      { email },
+      { acc_no: 1, _id: 0 }
+    );
+    
+    const connectedAccountId = user?.acc_no?.toString()
+    
+    const payout = await stripe.payouts.create(
+      {
+        amount: 1, 
+        currency: 'aud',
+      },
+      {
+        stripeAccount: connectedAccountId, 
+      }
+    );
+    res.status(200).json({
+      success:true,
+      payout
+    })
+  }catch(error){
+    res.status(500).json({
+      success:false,
+      message:error.message
+    })
+  }
+}
+
+
+export const getConnectedAccountBalance=async(req,res)=> {
+  try {
+    const {email } = req.body;
+    const user = await User.findOne(
+      { email },
+      { acc_no: 1, _id: 0 }
+    );
+    
+    const connectedAccountId = user?.acc_no?.toString()
+    if (!connectedAccountId) {
+      throw new Error('Connected account ID is required.');
+    }
+    const balance = await stripe.balance.retrieve({
+      stripeAccount: connectedAccountId,
+    });
+
+    res.status(200).json({
+      success:true,
+      balance
+    });
+  } catch (error) {
+   res.status(500).json({
+    success:false,
+    message:error.message
+   })
+  }
+}
+

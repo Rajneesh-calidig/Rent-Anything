@@ -18,7 +18,8 @@ import { useAuth } from "../../providers/Auth/AuthProvider";
 import { toast } from "react-toastify";
 import { differenceInMinutes } from "date-fns";
 import { formatTime } from "../../utils/date-utils";
-import RazorpayButton from "../payment/payment";
+import {loadStripe} from "@stripe/stripe-js"
+import { getSessionData } from "../../services/session.service";
 
 export default function BookItem() {
   const { getItem } = useItem();
@@ -121,6 +122,36 @@ export default function BookItem() {
       },
     ],
   });
+  const email=getSessionData("email")
+  const url=import.meta.env.VITE_API_BASE_URL
+  
+  const makePayment=async ()=>{
+    const secretKey=import.meta.env.VITE_STRIP_KEY
+const strip=await loadStripe(`${secretKey}`)
+const body={
+  product:product,
+  email:email,
+  startDate,
+  endDate,
+  totalPrice,
+  quantity
+}
+const headers={
+  "content-type":"application/json"
+}
+console.log("product details are",startDate,endDate,totalPrice)
+const response=await fetch(`${url}/payment/create-checkout-session`,{
+  method:"post",
+  headers:headers,
+  body:JSON.stringify(body)
+})
+const session=await response.json()
+console.log("this is ",session)
+const result=await strip.redirectToCheckout({
+  sessionId:session?.id
+})
+console.log("result is",result)
+  }
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -820,11 +851,8 @@ export default function BookItem() {
                 </label>
               </div>
 
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors">
-                <RazorpayButton
-                  item={product}
-                  amount={totalPrice + Math.round(totalPrice * 0.1)}
-                />
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors" onClick={makePayment}>
+               proceed to pay
               </button>
 
               <div className="mt-4 text-center text-sm text-gray-500">

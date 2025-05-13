@@ -7,17 +7,22 @@ import cors from 'cors'
 import cookieParser from "cookie-parser";
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { stripeWebhook } from './controllers/payments.controller.js';
 
 const app=express()
 
 connectDB()
+
+app.post('/api/payment/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cookieParser());
 // app.use(cookies());
 const corsOptions = {
-    origin:'http://localhost:5173',
+    origin: function (origin, callback) {
+        callback(null, true); // Allow all origins
+    },
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials:true
 }

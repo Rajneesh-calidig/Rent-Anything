@@ -9,12 +9,16 @@ const userSchema = new Schema(
     status: {
       type: String,
       enum: ["ACTIVE", "INACTIVE"],
-      default: "ACTIVE",
+      default: "Active",
     },
     userType: {
       type: String,
       enum: ["ADMIN", "USER"],
       default: "USER",
+    },
+    isLister:{
+      type:String,
+      default :"Pending"
     },
     email: {
       type: String,
@@ -60,7 +64,7 @@ const userSchema = new Schema(
       enum: ["EMAIL", "GOOGLE"],
       default: "EMAIL",
     },
-    razorpay_account_id: {
+    acc_no: {
       type: String,
     },
   },

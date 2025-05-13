@@ -6,6 +6,7 @@ import { UserProvider } from "./providers/User/UserProvider"
 import { Layout } from "./component/layout/layout"
 import AppRoutes from "./routes/AppRoutes"
 import { ToastContainer } from "react-toastify"
+import AdminDashboard from "./component/admin/admin-dashboard"
  export const App=()=>{
   return (
     <>
