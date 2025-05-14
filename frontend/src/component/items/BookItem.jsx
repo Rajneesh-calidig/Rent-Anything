@@ -207,7 +207,7 @@ console.log("result is",result)
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays + 1; // Include the start day
   };
-
+ const isDisabled = !startDate || !endDate;
   // Image gallery navigation
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) =>
@@ -851,9 +851,14 @@ console.log("result is",result)
                 </label>
               </div>
 
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors" onClick={makePayment}>
-               proceed to pay
-              </button>
+             <button
+        className={`w-full text-white py-3 rounded-lg font-medium transition-colors 
+          ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+        onClick={makePayment}
+        disabled={isDisabled}
+      >
+        Proceed to Pay
+      </button>
 
               <div className="mt-4 text-center text-sm text-gray-500">
                 You won't be charged yet

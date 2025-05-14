@@ -1,5 +1,6 @@
 import Rental from '../models/rental.js';
 import Item from '../models/item.js';
+import User from "../models/User.js"
 
 export const createRental = async (req, res) => {
   try {
@@ -41,10 +42,16 @@ export const getMyRentals = async (req, res) => {
 };
 
 export const getRentalsForMyItems = async (req, res) => {
+  const {email}=req.params
   try {
-    const rentals = await Rental.find({ ownerId: req.user.id })
+    const user=await User.find({email:email})
+// console.log("user is",user)
+
+    const rentals = await Rental.find({ renterId: user[0]._id })
       .populate('itemId')
-      .populate('renterId', 'name email');
+      .populate('ownerId', 'name email');
+console.log("user is",rentals)
+
     res.status(200).json(rentals);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -27,7 +27,7 @@ const rentalSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'active', 'returned', 'cancelled'],
+    enum: ['pending', "paid", 'cancelled'],
     default: 'pending',
   },
   totalAmount: {

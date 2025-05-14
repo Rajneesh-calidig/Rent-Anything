@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import {Search} from "lucide-react"
+import { getSessionData } from '../../services/session.service'
   
 
 const Transactions = ({user}) => {
+    const email=getSessionData('email')
 
     const [transactions, setTransactions] = useState([
         {
@@ -41,19 +43,71 @@ const Transactions = ({user}) => {
           type: "credit",
         },
       ])
+       const [showPopup, setShowPopup] = useState(false);
+  const [method, setMethod] = useState("");
+  const [bank, setBank] = useState("");
+  const [upiId, setUpiId] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [amount, setAmount] = useState(0);
+   
+  async function fetchData() {
+  try {
+    const [transactionsRes, balanceRes] = await Promise.all([
+      fetch(`http://localhost:4000/api/payment/transection/${email}`),
+      fetch(`http://localhost:4000/api/payment/account-balance/${email}`)
+    ]);
 
-      const formatCurrency = (amount) => {
-        return new Intl.NumberFormat("en-IN", {
-            style: "currency",
-            currency: "INR",
-            maximumFractionDigits: 0,
-        }).format(amount)
+    if (!transactionsRes.ok || !balanceRes.ok) {
+      throw new Error("Failed to fetch data");
     }
 
-    const formatDate = (dateString) => {
-        const options = { year: "numeric", month: "short", day: "numeric" }
-        return new Date(dateString).toLocaleDateString("en-US", options)
+    const transactionsData = await transactionsRes.json();
+    const balanceData = await balanceRes.json();
+      const balanceAmount =( balanceData?.balance?.instant_available?.[0]?.amount || 0)-amount;
+
+    setTransactions(transactionsData);
+    localStorage.setItem("balance",balanceAmount)
+  } catch (error) {
+    console.error("Error fetching payment data:", error);
+    // Optionally: set error state here
+  }
+}
+
+      useEffect(()=>{
+        fetchData()
+      },[])
+   const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-AU", {
+        style: "currency",
+        currency: "AUD",
+        maximumFractionDigits: 0,
+    }).format(amount);
+};
+
+  const formatDate = (createdAt) => {
+  const date = new Date(createdAt);
+  const options = { year: "numeric", month: "short", day: "numeric" };
+  return date.toLocaleDateString("en-US", options); // e.g., "May 13, 2025"
+};
+const handleConfirm = () => {
+    if (method === "upi") {
+      if (!upiId.endsWith("@ybl")) {
+        alert("UPI ID must end with @ybl");
+        return;
+      }
+      alert(`Processing payout to UPI: ${upiId}`);
+    } else if (method === "bank") {
+      if (!bank || !accountNumber) {
+        alert("Please select a bank and enter account number");
+        return;
+      }
+    const currentBalance = Number(localStorage.getItem('balance') || 0);
+const newBalance = currentBalance - Number(amount);
+localStorage.setItem('balance', newBalance);
+    
     }
+    setShowPopup(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -73,14 +127,102 @@ const Transactions = ({user}) => {
             <option value="debit">Debits</option>
             </select>
         </div>
-        <div className="flex space-x-2">
-            <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition-colors">
-            Export
-            </button>
-            <button className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 transition-colors">
-            Filter
-            </button>
+        <div className="p-4">
+      {/* Trigger Button */}
+      <div className="flex space-x-2">
+        <button
+          onClick={() => setShowPopup(true)}
+          className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 transition-colors"
+        >
+          Payout
+        </button>
+      </div>
+
+      {/* Popup Overlay */}
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+            <h2 className="text-xl font-semibold mb-4 text-center">Select Payout Method</h2>
+
+            {/* Payout Method Dropdown */}
+            <select
+              value={method}
+              onChange={(e) => {
+                setMethod(e.target.value);
+                setBank("");
+                setAccountNumber("");
+                setUpiId("");
+              }}
+              className="w-full p-2 border rounded mb-4"
+            >
+              <option value="">-- Choose Method --</option>
+              <option value="upi">UPI</option>
+              <option value="bank">Bank</option>
+            </select>
+
+            {/* UPI Input */}
+            {method === "upi" && (
+              <input
+                type="text"
+                placeholder="Enter UPI ID"
+                value={upiId}
+                onChange={(e) => setUpiId(e.target.value)}
+                className="w-full p-2 border rounded mb-4"
+              />
+            )}
+
+            {/* Bank Select + Account Input */}
+            {method === "bank" && (
+              <>
+                <select
+                  value={bank}
+                  onChange={(e) => setBank(e.target.value)}
+                  className="w-full p-2 border rounded mb-4"
+                >
+                  <option value="">-- Select Bank --</option>
+                  <option value="SBI">SBI</option>
+                  <option value="BOB">BOB</option>
+                  <option value="ICICI">ICICI</option>
+                  <option value="HDFC">HDFC</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="Enter Account Number"
+                  value={accountNumber}
+                  onChange={(e) => setAccountNumber(e.target.value)}
+                  className="w-full p-2 border rounded mb-4"
+                />
+              </>
+            )}
+            <input
+  type="number"
+  placeholder="Enter Amount (AUD)"
+  value={amount}
+  onChange={(e) => setAmount(e.target.value)}
+  className="w-full p-2 border rounded mb-4"
+  min="0"
+  step="0.01"
+/>
+
+            {/* Buttons */}
+            <div className="flex justify-between space-x-4">
+              <button
+                onClick={handleConfirm}
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded hover:from-purple-700 hover:to-indigo-700 transition-colors"
+              >
+                Confirm Payout
+              </button>
+              <button
+                onClick={() => setShowPopup(false)}
+                className="flex-1 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
+      )}
+    </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -88,7 +230,7 @@ const Transactions = ({user}) => {
             <div className="flex justify-between items-start">
             <div>
                 <p className="text-sm font-medium text-gray-500">Total Balance</p>
-                <h3 className="text-2xl font-bold text-gray-800 mt-1">{formatCurrency(user?.earnings)}</h3>
+                <h3 className="text-2xl font-bold text-gray-800 mt-1">{formatCurrency(localStorage.getItem("balance") || 0)}</h3>
             </div>
             <div className="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white">
                 <svg
@@ -181,22 +323,22 @@ const Transactions = ({user}) => {
                 </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-                {transactions.map((transaction) => (
+                { transactions.map((transaction) => (
                 <tr key={transaction.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction?.transection_id}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{formatDate(transaction.date)}</div>
+                    <div className="text-sm text-gray-900">{formatDate(transaction?.createdAt)}</div>
                     </td>
                     <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">{transaction.description}</div>
+                    <div className="text-sm text-gray-900">{transaction?.item_id?.title}</div>
                     </td>
                     <td
                     className={`px-6 py-4 whitespace-nowrap text-right text-sm font-medium ${
-                        transaction.type === "credit" ? "text-green-600" : "text-red-600"
+                        transaction.type === "credit" ?"text-green-600":   "text-red-600"
                     }`}
                     >
                     {transaction.type === "credit" ? "+" : "-"}
-                    {formatCurrency(Math.abs(transaction.amount))}
+                    {formatCurrency(Math.abs(transaction?.amount))}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                     <span

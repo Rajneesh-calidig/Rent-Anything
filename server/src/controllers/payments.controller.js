@@ -4,6 +4,7 @@ import crypto from "crypto";
 import Payment from "../models/payment.js"
 import User from "../models/User.js"
 import Stripe from "stripe"
+import Rental from "../models/rental.js"
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const stripeWebHookKey=process.env.STRIPE_WEBHOOK_KEY
 const instance = new Razorpay({
@@ -111,52 +112,53 @@ export const verifyPayment = async (req, res) => {
 
 export const createOrderByStripe = async (req, res) => {
   try {
-    const { product, email } = req.body;
+    const { product, email ,totalPrice,startDate,endDate} = req.body;
     const user = await User.findOne(
       { _id: product.ownerId._id },
       { acc_no: 1, _id: 0 }
     );
-    console.log("our product is",req.body)
     
-    // const connectedAccountId = user?.acc_no?.toString()
+    const connectedAccountId = user?.acc_no?.toString()
     // Save payment to DB
-    // const newPayment = await Payment.create({
-    //   item_id: product._id,
-    //   owner_id: product.ownerId._id,
-    //   amount: product.pricePerDay,
-    //   transfer_amount: product.pricePerDay,
-    // });
+    const newPayment = await Payment.create({
+      item_id: product._id,
+      owner_id: product.ownerId._id,
+      amount:  totalPrice,
+      transfer_amount: product.pricePerDay,
+    });
 
-    // const session = await stripe.checkout.sessions.create({
-    //   payment_method_types: ["card"],
-    //   line_items: [
-    //     {
-    //       price_data: {
-    //         currency: "aud",
-    //         product_data: {
-    //           name: product.title,
-    //         },
-    //         unit_amount: Math.round(product.pricePerDay * 100),
-    //       },
-    //       quantity: 1,
-    //     },
-    //   ],
-    //   mode: "payment",
-    //   success_url: "http://localhost:3000/success",
-    //   cancel_url: "http://localhost:3000/cancel",
-    //   customer_email: email,
-    //   metadata: {
-    //     payment_id: newPayment._id.toString(),
-    //   },
-    //   payment_intent_data: {
-    //     application_fee_amount: Math.round(product.platformFee * 100 || 0), // Optional platform fee
-    //     transfer_data: {
-    //       destination: connectedAccountId, // Connected account ID
-    //     },
-    //   },
-    // });
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "aud",
+            product_data: {
+              name: product.title,
+            },
+            unit_amount: Math.round(totalPrice* 100),
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel",
+      customer_email: email,
+      metadata: {
+        payment_id: newPayment._id.toString(),
+        startDate:startDate,
+          endDate:endDate
+      },
+      payment_intent_data: {
+        application_fee_amount: Math.round(product.platformFee * 100 || 0), // Optional platform fee
+        transfer_data: {
+          destination: connectedAccountId, // Connected account ID
+        },
+      },
+    });
 
-    res.json({ id: session.id });
+  res.json({ id: session.id });
   } catch (error) {
     console.error("Stripe session error:", error);
     res.status(500).json({ success: false, error: error.message });
@@ -178,35 +180,61 @@ export const stripeWebhook = async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const email = session.customer_email;
-    const paymentIntentId = session.payment_intent;
-    const ongoingPayment=session.metadata.payment_id
-    const status=session.payment_status
+ if (event.type === 'checkout.session.completed') {
+  const session = event.data.object;
+  const email = session.customer_email;
+  const paymentIntentId = session.payment_intent;
+  const ongoingPayment = session.metadata.payment_id;
+  const startDate = session.metadata.startDate;
+  const endDate = session.metadata.endDate;
+  const amount_total = session.amount_total / 100; // Correct source
+  const status = session.payment_status;
 
-    try {
-     const user= await User.findOne(
-        { email }
-      );
-      const completePayment = await Payment.findOneAndUpdate(
-  { _id: ongoingPayment }, // ✅ Proper filter
-  {
-    $set: {
-      rentee_id: user._id,
-      transection_id: paymentIntentId,
-      status: status
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      console.error("User not found for email:", email);
+      return;
     }
-  },
-  { new: true } // ✅ Optional: returns updated document
-);
-    } catch (err) {
-     res.status(500).json({
-      success:false,
-      error:err.message
-     })
+
+    const completePayment = await Payment.findOneAndUpdate(
+      { _id: ongoingPayment },
+      {
+        $set: {
+          rentee_id: user._id,
+          transection_id: paymentIntentId,
+          status: status
+        }
+      },
+      { new: true }
+    );
+
+    if (!completePayment) {
+      console.error("Payment not found for ID:", ongoingPayment);
+      return;
     }
+
+    if (status === 'paid') {
+      await Rental.create({
+        itemId: completePayment.item_id,
+        renterId: user._id,
+        ownerId: completePayment.owner_id,
+        startDate: startDate,
+        endDate: endDate,
+        status: status,
+        totalAmount: amount_total
+      });
+    }
+  } catch (err) {
+   res.status(500).json({
+    success:false,
+    message:err.message
+   })
   }
+}
+
 
   res.status(200).json({ received: true });
 };
@@ -327,7 +355,7 @@ export const listerPayout=async(req,res)=>{
 
 export const getConnectedAccountBalance=async(req,res)=> {
   try {
-    const {email } = req.body;
+    const {email } = req.params;
     const user = await User.findOne(
       { email },
       { acc_no: 1, _id: 0 }
@@ -350,6 +378,23 @@ export const getConnectedAccountBalance=async(req,res)=> {
     success:false,
     message:error.message
    })
+  }
+}
+
+export const getUserTransection=async(req,res)=>{
+  const {email}=req.params
+  try{
+ const user=await User.find({email:email})
+
+    const payments = await Payment.find({ rentee_id: user[0]._id })
+      .populate('item_id')
+      .populate('owner_id', 'name email');
+    res.status(200).json(payments);
+  }catch(err){
+    res.status(500).json({
+      success:false,
+      err:err.message
+    })
   }
 }
 

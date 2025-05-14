@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import {Search} from "lucide-react"
+import { useEffect } from 'react'
+import { getSessionData } from '../../services/session.service'
 
 const MyOrders = () => {
 
@@ -32,14 +34,23 @@ const MyOrders = () => {
           status: "upcoming",
         },
       ])
+      const email=getSessionData(('email'))
+      async function fetchData(){
+        const data=await fetch(`http://localhost:4000/api/rental/my-items/${email}`)
+        const res=await data.json()
+        setOrders(res)
+      }
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat("en-IN", {
-            style: "currency",
-            currency: "INR",
-            maximumFractionDigits: 0,
-        }).format(amount)
-    }
+      useEffect(()=>{
+        fetchData()
+      },[])
+ const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-AU", {
+        style: "currency",
+        currency: "AUD",
+        maximumFractionDigits: 0,
+    }).format(amount);
+};
 
     const formatDate = (dateString) => {
         const options = { year: "numeric", month: "short", day: "numeric" }
@@ -95,29 +106,29 @@ const MyOrders = () => {
                 </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-                {orders.map((order) => (
+                {orders.length && orders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order?._id}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{order.itemName}</div>
+                    <div className="text-sm font-medium text-gray-900">{order?.itemId?.title}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{order.owner}</div>
+                    <div className="text-sm text-gray-900">{order?.ownerId?.name}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                        {formatDate(order.startDate)} - {formatDate(order.endDate)}
+                        {formatDate(order?.startDate)} - {formatDate(order?.endDate)}
                     </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-indigo-600">
-                        {formatCurrency(order.totalAmount)}
+                        {formatCurrency(order?.totalAmount)}
                     </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                     <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        order.status === "active"
+                        order.status === "paid"
                             ? "bg-green-100 text-green-800"
                             : order.status === "completed"
                             ? "bg-blue-100 text-blue-800"
