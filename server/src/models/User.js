@@ -9,16 +9,16 @@ const userSchema = new Schema(
     status: {
       type: String,
       enum: ["ACTIVE", "INACTIVE"],
-      default: "Active",
+      default: "ACTIVE",
     },
     userType: {
       type: String,
       enum: ["ADMIN", "USER"],
       default: "USER",
     },
-    isLister:{
-      type:String,
-      default :"Pending"
+    isLister: {
+      type: String,
+      default: "Pending",
     },
     email: {
       type: String,
