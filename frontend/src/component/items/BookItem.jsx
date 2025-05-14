@@ -20,6 +20,9 @@ import { differenceInMinutes } from "date-fns";
 import { formatTime, formatDate } from "../../utils/date-utils";
 import RazorpayButton from "../payment/payment";
 import { useLoader } from "../../providers/Loader/LoaderProvider";
+import { formatTime } from "../../utils/date-utils";
+import { loadStripe } from "@stripe/stripe-js";
+import { getSessionData } from "../../services/session.service";
 
 export default function BookItem() {
   const { getItem, likeItem } = useItem();
@@ -28,6 +31,36 @@ export default function BookItem() {
   // const { navigate } = useNavigate();
   const [product, setProduct] = useState();
   const loader = useLoader();
+  const email = getSessionData("email");
+  const url = import.meta.env.VITE_API_BASE_URL;
+
+  const makePayment = async () => {
+    const secretKey = import.meta.env.VITE_STRIP_KEY;
+    const strip = await loadStripe(`${secretKey}`);
+    const body = {
+      product: product,
+      email: email,
+      startDate,
+      endDate,
+      totalPrice,
+      quantity,
+    };
+    const headers = {
+      "content-type": "application/json",
+    };
+    console.log("product details are", startDate, endDate, totalPrice);
+    const response = await fetch(`${url}/payment/create-checkout-session`, {
+      method: "post",
+      headers: headers,
+      body: JSON.stringify(body),
+    });
+    const session = await response.json();
+    console.log("this is ", session);
+    const result = await strip.redirectToCheckout({
+      sessionId: session?.id,
+    });
+    console.log("result is", result);
+  };
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -92,7 +125,7 @@ export default function BookItem() {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays + 1; // Include the start day
   };
-
+  const isDisabled = !startDate || !endDate;
   // Image gallery navigation
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) =>
@@ -733,11 +766,17 @@ export default function BookItem() {
                 </label>
               </div>
 
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors">
-                <RazorpayButton
-                  item={product}
-                  amount={totalPrice + Math.round(totalPrice * 0.1)}
-                />
+              <button
+                className={`w-full text-white py-3 rounded-lg font-medium transition-colors 
+          ${
+            isDisabled
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+                onClick={makePayment}
+                disabled={isDisabled}
+              >
+                Proceed to Pay
               </button>
 
               <div className="mt-4 text-center text-sm text-gray-500">

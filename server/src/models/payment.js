@@ -3,50 +3,35 @@ import mongoose, { Schema } from "mongoose";
 const paymentSchema = new mongoose.Schema(
   {
     // Razorpay transaction details
-    razorpay_order_id: {
-      type: String,
-      required: true,
-      index: true,
-    },
-    razorpay_payment_id: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    razorpay_signature: {
-      type: String,
-      required: true,
-    },
+   transection_id:{
+    type:String
+   },
 
     // Razorpay Linked Account (to whom money is transferred)
     owner_razorpay_account_id: {
       type: String, // acc_xxxxxxxxxx
-      required: true,
+      required: false,
     },
 
     // References to your app's data
     item_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Item',
-      required: true,
+      required: false,
     },
     rentee_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false,
     },
     owner_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false,
     },
 
     // Financials
     amount: {
-      type: Number,
-      required: true,
-    },
-    commission: {
       type: Number,
       required: true,
     },
@@ -68,7 +53,7 @@ const paymentSchema = new mongoose.Schema(
     // Status of this record
     status: {
       type: String,
-      enum: ['pending', 'success', 'failure'],
+      // enum: ['pending', 'success', 'failure'],
       default: 'pending',
     },
 

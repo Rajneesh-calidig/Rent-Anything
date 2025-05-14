@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/', createRental);
 router.get('/my', protectRoute, getMyRentals);
-router.get('/my-items', protectRoute, getRentalsForMyItems);
+router.get('/my-items/:email', getRentalsForMyItems);
 router.put('/:id/status', protectRoute, updateRentalStatus);
 
 export default router;
