@@ -148,7 +148,7 @@ export const createOrderByStripe = async (req, res) => {
           endDate:endDate
       },
       payment_intent_data: {
-        application_fee_amount: Math.round(product.platformFee * 100 || 0), // Optional platform fee
+        application_fee_amount:10, // Optional platform fee
         transfer_data: {
           destination: connectedAccountId, // Connected account ID
         },
