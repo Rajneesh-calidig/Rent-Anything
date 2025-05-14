@@ -8,7 +8,8 @@ export const Layout = ({ children }) => {
       <div>
         {location.pathname !== "/google/callback" && <Header></Header>}
         <div className="min-h-dvh">{children}</div>
-        {location.pathname !== "/google/callback" && <Footer></Footer>}
+        {location.pathname !== "/google/callback" &&
+          location.pathname !== "/dashboard" && <Footer></Footer>}
       </div>
     </>
   );

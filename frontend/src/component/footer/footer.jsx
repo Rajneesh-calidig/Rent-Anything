@@ -192,7 +192,7 @@ export const Footer = () => {
             </a>
             . All Rights Reserved.
           </span>
-          <div className="flex mt-4 sm:justify-center md:mt-0 space-x-5">
+          {/* <div className="flex mt-4 sm:justify-center md:mt-0 space-x-5">
             <a
               href="#"
               className="text-gray-500 hover:text-indigo-600 transition-colors"
@@ -265,7 +265,7 @@ export const Footer = () => {
               </svg>
               <span className="sr-only">GitHub account</span>
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

@@ -51,7 +51,8 @@ const userSchema = new Schema(
       type: String,
     },
     likedItems: {
-      type: [String],
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Item",
       default: [],
     },
     kycStatus: {

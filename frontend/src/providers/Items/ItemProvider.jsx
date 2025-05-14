@@ -104,9 +104,10 @@ export const ItemProvider = ({ children }) => {
   );
 
   const getLikedItems = useCallback(
-    async (itemId, userId) => {
+    async (userId) => {
       try {
         const response = await api.get(`/items/liked-items/${userId}`);
+        console.log(response.data.data);
         return response;
       } catch (err) {
         console.error(
@@ -165,7 +166,6 @@ export const ItemProvider = ({ children }) => {
 
   const deleteImage = useCallback(async (imageName, itemId) => {
     try {
-      console.log(itemId);
       const response = await api.put(`/items/${itemId}/image/delete`, {
         imageName,
       });

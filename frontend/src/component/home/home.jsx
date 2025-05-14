@@ -82,14 +82,14 @@ export const Home = () => {
                 From tools to vacation gear, we connect you with what you need,
                 when you need it.
               </p>
-              <div className="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
+              {/* <div className="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
                 <button className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition-all transform hover:scale-105">
                   Get Started
                 </button>
                 <button className="border-2 border-black px-8 py-3 rounded-full font-medium hover:bg-black hover:text-white transition-all">
                   Learn More
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* Search Box */}

@@ -601,7 +601,7 @@ export default function Dashboard() {
                 alt="Profile"
                 className="w-10 h-10 rounded-full object-cover border-2 border-indigo-100"
               />
-              <div
+              {/* <div
                 className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
                   user.kycStatus === "verified"
                     ? "bg-green-500"
@@ -609,7 +609,7 @@ export default function Dashboard() {
                     ? "bg-yellow-500"
                     : "bg-gray-400"
                 }`}
-              ></div>
+              ></div> */}
             </div>
             {sidebarOpen && (
               <div className="ml-3">
@@ -759,7 +759,7 @@ export default function Dashboard() {
             {sidebarOpen && <span className="ml-3">Profile</span>}
           </button>
 
-          <button
+          {/* <button
             onClick={() => {
               setActiveSection("settings");
               setActiveSidebarItem("settings");
@@ -773,7 +773,7 @@ export default function Dashboard() {
           >
             <Settings size={18} className="min-w-[18px] min-h-[18px]" />
             {sidebarOpen && <span className="ml-3">Settings</span>}
-          </button>
+          </button> */}
         </nav>
 
         {/* Logout */}

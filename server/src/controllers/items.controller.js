@@ -1,12 +1,9 @@
 import { deleteCloudinaryImage } from "../utils/cloudinaryDelete.js";
-import { fileURLToPath } from "url";
 import Item from "../models/item.js";
 import Rental from "../models/rental.js";
 import Review from "../models/review.js";
 import mongoose from "mongoose";
 import User from "../models/User.js";
-import fs from "fs";
-import path from "path";
 
 export const createItem = async (req, res) => {
   try {
@@ -71,8 +68,17 @@ export const getAllItems = async (req, res) => {
 
 export const getLikedItems = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).populate("likedItems");
+    console.log(req.params.userId);
+    // const userId = new mongoose.Types.ObjectId(req.params.userId);
+    const user = await User.findById(req.params.userId).populate({
+      path: "likedItems",
+      populate: {
+        path: "ownerId",
+        select: "name email createdAt profileImage",
+      },
+    });
     const likedItems = user.likedItems;
+    console.log(likedItems);
     return res.status(200).json({ message: "success", data: likedItems });
   } catch (err) {
     console.log(err);

@@ -21,6 +21,7 @@ import { useLoader } from "../../../providers/Loader/LoaderProvider";
 const EditMyItem = ({ setShowEditModal, editItemData, setEditItemData }) => {
   const [imagePreview, setImagePreview] = useState([...editItemData?.images]);
   const [categoryIndex, setCategoryIndex] = useState();
+  const [removing, setRemoving] = useState();
   const categories = [
     {
       name: "Electronics",
@@ -247,9 +248,13 @@ const EditMyItem = ({ setShowEditModal, editItemData, setEditItemData }) => {
         loader.start();
         const res = await deleteImage(name, editItemData._id);
         if (res.status === 200) {
-          setImagePreview((prevImage) => {
-            return prevImage.filter((img) => img !== name);
-          });
+          setTimeout(() => {
+            setRemoving(index);
+            setImagePreview((prevImage) => {
+              return prevImage.filter((img) => img !== name);
+            });
+          }, 300);
+          setRemoving(null);
           console.log(editItemData);
           const updatedImages = editItemData.images.filter(
             (img) => img !== name
@@ -591,10 +596,8 @@ const EditMyItem = ({ setShowEditModal, editItemData, setEditItemData }) => {
                         {imagePreview?.map((src, index) => (
                           <div
                             key={index}
-                            // onDragEnd={() => console.log("drag")}
                             draggable
-                            onDrag={(e) => handleDragStart(index, e)}
-                            // ondrag
+                            onDragStart={(e) => handleDragStart(index, e)}
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={(e) => handleDrop(e, index)}
                             className={`relative group ${
@@ -623,6 +626,29 @@ const EditMyItem = ({ setShowEditModal, editItemData, setEditItemData }) => {
                             </button>
                           </div>
                         ))}
+                        {/* {imagePreview.map((src, index) => (
+                          <div
+                            key={src}
+                            className={`relative group overflow-hidden transition-all duration-300 ease-in-out`}
+                            // style={{ transitionProperty: "width, opacity" }}
+                          >
+                            <img
+                              src={src}
+                              alt={`Preview ${index + 1}`}
+                              className={`h-24 object-cover rounded-lg transition-all duration-300 `}
+                              // onClick={(e) =>
+                              //   handleThumbnailSelection(src, index, e)
+                              // }
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(index)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))} */}
 
                         {imagePreview.length < 5 && (
                           <label

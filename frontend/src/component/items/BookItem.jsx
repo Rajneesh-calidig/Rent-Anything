@@ -248,11 +248,7 @@ export default function BookItem() {
               onMouseLeave={() => setIsZoomed(false)}
             >
               <img
-                src={
-                  `${import.meta.env.VITE_FILE_URL}${
-                    product?.images[currentImageIndex]
-                  }` || "/placeholder.svg"
-                }
+                src={product?.images[currentImageIndex]}
                 alt={product?.title}
                 className={`w-full h-full object-contain transition-transform duration-200 ${
                   isZoomed ? "scale-150" : ""
@@ -307,10 +303,7 @@ export default function BookItem() {
                   onClick={() => selectImage(index)}
                 >
                   <img
-                    src={
-                      `${import.meta.env.VITE_FILE_URL}${image}` ||
-                      "/placeholder.svg"
-                    }
+                    src={image}
                     alt={`Thumbnail ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
@@ -404,11 +397,7 @@ export default function BookItem() {
               <h2 className="text-lg font-semibold mb-4">About the Owner</h2>
               <div className="flex items-start">
                 <img
-                  src={
-                    `${import.meta.env.VITE_FILE_URL}${
-                      product?.ownerId?.profileImage
-                    }` || "/placeholder.svg"
-                  }
+                  src={product?.ownerId?.profileImage}
                   alt={product?.owner?.name}
                   className="w-16 h-16 rounded-full object-cover mr-4"
                 />
@@ -524,11 +513,7 @@ export default function BookItem() {
                   >
                     <div className="flex items-start">
                       <img
-                        src={
-                          `${import.meta.env.VITE_FILE_URL}${
-                            review.userId?.profileImage
-                          }` || "/placeholder.svg"
-                        }
+                        src={review.userId?.profileImage}
                         alt={review.userId?.name}
                         className="w-10 h-10 rounded-full object-cover mr-3"
                       />
@@ -546,7 +531,7 @@ export default function BookItem() {
                         <p className="mt-2 text-gray-600">{review.comment}</p>
 
                         {/* Review actions */}
-                        <div className="flex items-center mt-3 text-sm">
+                        {/* <div className="flex items-center mt-3 text-sm">
                           <button className="text-gray-500 hover:text-gray-700 mr-4 flex items-center">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -581,7 +566,7 @@ export default function BookItem() {
                             </svg>
                             Not helpful
                           </button>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -671,7 +656,7 @@ export default function BookItem() {
                 />
               </div>
 
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Quantity
                 </label>
@@ -700,7 +685,7 @@ export default function BookItem() {
                     +
                   </button>
                 </div>
-              </div>
+              </div> */}
 
               <div className="space-y-2 mb-6">
                 <div className="flex justify-between text-sm">
@@ -828,11 +813,7 @@ export default function BookItem() {
                     >
                       <div className="flex items-start">
                         <img
-                          src={
-                            `${import.meta.env.VITE_FILE_URL}${
-                              review.userId?.profileImage
-                            }` || "/placeholder.svg"
-                          }
+                          src={review.userId?.profileImage}
                           alt={review.userId?.name}
                           className="w-10 h-10 rounded-full object-cover mr-3"
                         />

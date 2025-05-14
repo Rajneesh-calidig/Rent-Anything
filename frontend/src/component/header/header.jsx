@@ -204,18 +204,18 @@ export const Header = () => {
                   className="hidden sm:flex items-center space-x-3 p-1.5 rounded-full hover:bg-gray-100 transition-all"
                 >
                   <div className="relative">
-                    {user.avatar ? (
+                    {user.profileImage ? (
                       <img
-                        src={user.avatar || "/placeholder.svg"}
+                        src={user.profileImage || "/placeholder.svg"}
                         alt={user.name}
-                        className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm"
+                        className="w-8 h-8 rounded-full object-cover  shadow-sm"
                       />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white font-medium text-sm">
                         {user.name?.charAt(0).toUpperCase() || "U"}
                       </div>
                     )}
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                    {/* <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div> */}
                   </div>
                   <div className="flex flex-col items-start">
                     <span className="font-medium text-sm text-gray-900 leading-tight">

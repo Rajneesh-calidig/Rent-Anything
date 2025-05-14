@@ -1,11 +1,10 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Heart, Search, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../providers/Auth/AuthProvider";
 import { useLoader } from "../../providers/Loader/LoaderProvider";
+import { useItem } from "../../providers/Items/ItemProvider";
 
 const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
@@ -14,6 +13,7 @@ const Favorites = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const { getLikedItems, likeItem } = useItem();
 
   const itemsPerPage = 5;
   const { user } = useAuth();
@@ -26,98 +26,11 @@ const Favorites = () => {
       try {
         loader.start();
         // Replace with actual API call to fetch favorites
-        // const response = await getFavorites(user._id);
-
-        // Sample data
-        const sampleFavorites = [
-          {
-            _id: "1",
-            title: "Professional Camera",
-            category: "Electronics",
-            pricePerDay: 250,
-            status: "available",
-            views: 120,
-            likes: 45,
-            owner: { name: "John Doe" },
-            createdAt: "2023-10-15T12:00:00Z",
-            images: ["camera.jpg"],
-          },
-          {
-            _id: "2",
-            title: "Mountain Bike",
-            category: "Sports",
-            pricePerDay: 150,
-            status: "available",
-            views: 87,
-            likes: 32,
-            owner: { name: "Jane Smith" },
-            createdAt: "2023-11-05T15:30:00Z",
-            images: ["bike.jpg"],
-          },
-          {
-            _id: "3",
-            title: "Drone",
-            category: "Electronics",
-            pricePerDay: 300,
-            status: "available",
-            views: 210,
-            likes: 67,
-            owner: { name: "Robert Johnson" },
-            createdAt: "2023-09-22T09:15:00Z",
-            images: ["drone.jpg"],
-          },
-          {
-            _id: "4",
-            title: "Camping Tent",
-            category: "Outdoor",
-            pricePerDay: 100,
-            status: "available",
-            views: 65,
-            likes: 28,
-            owner: { name: "Emily Wilson" },
-            createdAt: "2023-12-01T11:45:00Z",
-            images: ["tent.jpg"],
-          },
-          {
-            _id: "5",
-            title: "Power Drill",
-            category: "Tools",
-            pricePerDay: 80,
-            status: "available",
-            views: 42,
-            likes: 15,
-            owner: { name: "Michael Brown" },
-            createdAt: "2023-11-18T14:20:00Z",
-            images: ["drill.jpg"],
-          },
-          {
-            _id: "6",
-            title: "Projector",
-            category: "Electronics",
-            pricePerDay: 200,
-            status: "available",
-            views: 110,
-            likes: 38,
-            owner: { name: "Sarah Davis" },
-            createdAt: "2023-10-30T16:10:00Z",
-            images: ["projector.jpg"],
-          },
-          {
-            _id: "7",
-            title: "Kayak",
-            category: "Sports",
-            pricePerDay: 180,
-            status: "available",
-            views: 95,
-            likes: 41,
-            owner: { name: "David Lee" },
-            createdAt: "2023-09-10T10:30:00Z",
-            images: ["kayak.jpg"],
-          },
-        ];
-
-        setFavorites(sampleFavorites);
-        setTotalPages(Math.ceil(sampleFavorites.length / itemsPerPage));
+        const response = await getLikedItems(user._id);
+        if (response.status === 200) {
+          setFavorites(response.data.data);
+          setTotalPages(Math.ceil(response.data.data.length / itemsPerPage));
+        }
       } catch (err) {
         toast.error("Failed to load favorites");
         console.error("Error fetching favorites:", err);
@@ -126,24 +39,24 @@ const Favorites = () => {
         loader.stop();
       }
     };
-
-    fetchFavorites();
-  }, [user._id]);
+    if (user._id) {
+      fetchFavorites();
+    }
+  }, [user]);
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
-  const removeFavorite = async (id) => {
+  const removeFavorite = async (id, userId) => {
     try {
       loader.start();
-      // Replace with actual API call
-      // const response = await removeFavoriteItem(id);
-
-      // Optimistically remove from UI
-      setFavorites(favorites.filter((item) => item._id !== id));
-      toast.success("Item removed from favorites!");
+      const response = await likeItem(id, userId);
+      if (response.status === 200) {
+        setFavorites(favorites.filter((item) => item._id !== id));
+        toast.success("Item removed from favorites!");
+      }
     } catch (err) {
       toast.error("Failed to remove from favorites");
       console.error("Error removing favorite:", err);
@@ -239,12 +152,7 @@ const Favorites = () => {
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0">
                           <img
-                            src={
-                              `${
-                                import.meta.env.VITE_FILE_URL ||
-                                "/placeholder.svg"
-                              }${item.images[0]}` || "/placeholder.svg"
-                            }
+                            src={item.images[0]}
                             alt={item.title}
                             className="h-10 w-10 rounded-md object-cover"
                           />
@@ -271,7 +179,7 @@ const Favorites = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {item.owner.name}
+                        {item?.ownerId?.name}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -287,7 +195,7 @@ const Favorites = () => {
                         </button>
                         <button
                           className="text-red-600 hover:text-red-900"
-                          onClick={() => removeFavorite(item._id)}
+                          onClick={() => removeFavorite(item._id, user._id)}
                         >
                           <Heart size={16} fill="#f43f5e" />
                         </button>
