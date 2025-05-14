@@ -19,7 +19,6 @@ import { toast } from "react-toastify";
 import { differenceInMinutes } from "date-fns";
 import { formatTime, formatDate } from "../../utils/date-utils";
 import { useLoader } from "../../providers/Loader/LoaderProvider";
-import { formatTime } from "../../utils/date-utils";
 import { loadStripe } from "@stripe/stripe-js";
 import { getSessionData } from "../../services/session.service";
 
