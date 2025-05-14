@@ -18,7 +18,6 @@ import { useAuth } from "../../providers/Auth/AuthProvider";
 import { toast } from "react-toastify";
 import { differenceInMinutes } from "date-fns";
 import { formatTime, formatDate } from "../../utils/date-utils";
-import RazorpayButton from "../payment/payment";
 import { useLoader } from "../../providers/Loader/LoaderProvider";
 import { formatTime } from "../../utils/date-utils";
 import { loadStripe } from "@stripe/stripe-js";
