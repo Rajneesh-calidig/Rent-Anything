@@ -24,12 +24,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 // app.use(cookies());
 const corsOptions = {
-  origin: function (origin, callback) {
-    callback(null, true); // Allow all origins
-  },
+  origin: "https://rent-anything-frontend.vercel.app", // ✅ Replace with your frontend URL
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
+  credentials: true, // ✅ Allow cookies & authorization headers
 };
+
 app.use(cors(corsOptions));
 
 const __filename = fileURLToPath(import.meta.url);
