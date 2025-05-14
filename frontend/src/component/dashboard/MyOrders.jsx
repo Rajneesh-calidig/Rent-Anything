@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Search, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { getSessionData } from "../../services/session.service";
 
 const MyOrders = () => {
   const [orders, setOrders] = useState();
@@ -25,12 +26,12 @@ const MyOrders = () => {
 
   // Get unique statuses for filter dropdown
   const statuses = useMemo(() => {
-    const uniqueStatuses = [...new Set(orders.map((order) => order.status))];
+    const uniqueStatuses = [...new Set(orders?.map((order) => order.status))];
     return ["all", ...uniqueStatuses];
   }, [orders]);
 
   const filteredOrders = useMemo(() => {
-    return orders.filter((order) => {
+    return orders?.filter((order) => {
       const matchesSearch =
         order.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -41,11 +42,11 @@ const MyOrders = () => {
     });
   }, [orders, searchTerm, selectedStatus]);
 
-  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredOrders?.length / itemsPerPage);
 
   const paginatedOrders = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
-    return filteredOrders.slice(start, start + itemsPerPage);
+    return filteredOrders?.slice(start, start + itemsPerPage);
   }, [filteredOrders, currentPage, itemsPerPage]);
 
   // Reset to first page when search term or status changes
@@ -120,16 +121,16 @@ const MyOrders = () => {
                     Loading orders...
                   </td>
                 </tr>
-              ) : paginatedOrders.length === 0 ? (
+              ) : paginatedOrders?.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="px-6 py-4 text-center">
-                    {filteredOrders.length === 0
+                    {filteredOrders?.length === 0
                       ? "No orders found."
                       : "No orders match your search criteria."}
                   </td>
                 </tr>
               ) : (
-                paginatedOrders.map((order, index) => (
+                paginatedOrders?.map((order, index) => (
                   <tr key={order.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {order?._id}
@@ -182,7 +183,7 @@ const MyOrders = () => {
         </div>
 
         {/* Pagination */}
-        {filteredOrders.length > 0 && (
+        {filteredOrders?.length > 0 && (
           <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
             {/* Mobile View */}
             <div className="flex-1 flex justify-between sm:hidden">
@@ -216,11 +217,11 @@ const MyOrders = () => {
                   <span className="font-medium">
                     {Math.min(
                       currentPage * itemsPerPage,
-                      filteredOrders.length
+                      filteredOrders?.length
                     )}
                   </span>{" "}
                   of{" "}
-                  <span className="font-medium">{filteredOrders.length}</span>{" "}
+                  <span className="font-medium">{filteredOrders?.length}</span>{" "}
                   results
                 </p>
               </div>
@@ -239,7 +240,7 @@ const MyOrders = () => {
                     <span className="sr-only">Previous</span>
                     <ChevronLeft className="h-5 w-5" />
                   </button>
-                  {[...Array(totalPages)].map((_, i) => (
+                  {[...Array(totalPages)]?.map((_, i) => (
                     <button
                       key={i}
                       onClick={() => setCurrentPage(i + 1)}

@@ -24,7 +24,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 // app.use(cookies());
 const corsOptions = {
-  origin: "https://rent-anything-frontend.vercel.app", // ✅ Replace with your frontend URL
+  origin: [
+    "https://rent-anything-frontend.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:5174",
+  ], // ✅ Replace with your frontend URL
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true, // ✅ Allow cookies & authorization headers
 };
