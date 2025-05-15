@@ -28,6 +28,7 @@ const corsOptions = {
     "https://rent-anything-frontend.vercel.app",
     "http://localhost:5173",
     "http://localhost:5174",
+    "https://ra-admin-delta.vercel.app",
   ], // ✅ Replace with your frontend URL
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true, // ✅ Allow cookies & authorization headers
