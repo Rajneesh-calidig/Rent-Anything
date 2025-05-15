@@ -18,7 +18,7 @@ const userSchema = new Schema(
     },
     isLister: {
       type: String,
-      enum: ["true", "false", "pending"],
+      enum: ["true", "false", "rejected", "pending"],
       default: "false",
     },
     email: {
