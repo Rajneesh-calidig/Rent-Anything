@@ -139,7 +139,7 @@ export const createOrderByStripe = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL}/success`,
+      success_url: `${process.env.FRONTEND_URL_SUCCESS}/success`,
       cancel_url: "http://localhost:3000/cancel",
       customer_email: email,
       metadata: {
