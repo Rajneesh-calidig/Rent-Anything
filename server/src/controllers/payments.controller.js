@@ -139,7 +139,7 @@ export const createOrderByStripe = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: "http://localhost:3000/success",
+      success_url: `${process.env.FRONTEND_URL}/success`,
       cancel_url: "http://localhost:3000/cancel",
       customer_email: email,
       metadata: {
@@ -166,75 +166,71 @@ export const createOrderByStripe = async (req, res) => {
 
 export const stripeWebhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];
-
   let event;
 
   try {
-    // ✅ Use raw body here
     event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
     console.error('❌ Stripe webhook verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
- if (event.type === 'checkout.session.completed') {
-  const session = event.data.object;
-  const email = session.customer_email;
-  const paymentIntentId = session.payment_intent;
-  const ongoingPayment = session.metadata.payment_id;
-  const startDate = session.metadata.startDate;
-  const endDate = session.metadata.endDate;
-  const amount_total = session.amount_total / 100; // Correct source
-  const status = session.payment_status;
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const email = session.customer_email;
+    const paymentIntentId = session.payment_intent;
+    const ongoingPayment = session.metadata.payment_id;
+    const startDate = session.metadata.startDate;
+    const endDate = session.metadata.endDate;
+    const amount_total = session.amount_total / 100;
+    const status = session.payment_status;
 
+    try {
+      const user = await User.findOne({ email });
 
-  try {
-    const user = await User.findOne({ email });
+      if (!user) {
+        console.error("User not found for email:", email);
+        return res.status(200).send('User not found, but acknowledged');
+      }
 
-    if (!user) {
-      console.error("User not found for email:", email);
-      return;
+      const completePayment = await Payment.findOneAndUpdate(
+        { _id: ongoingPayment },
+        {
+          $set: {
+            rentee_id: user._id,
+            transection_id: paymentIntentId,
+            status: status
+          }
+        },
+        { new: true }
+      );
+
+      if (!completePayment) {
+        console.error("Payment not found for ID:", ongoingPayment);
+        return res.status(200).send('Payment not found, but acknowledged');
+      }
+
+      if (status === 'paid') {
+        await Rental.create({
+          itemId: completePayment.item_id,
+          renterId: user._id,
+          ownerId: completePayment.owner_id,
+          startDate: startDate,
+          endDate: endDate,
+          status: status,
+          totalAmount: amount_total
+        });
+      }
+    } catch (err) {
+      console.error("❌ Error processing payment:", err.message);
+      // Even if internal error, send 200 so Stripe doesn't retry
+      return res.status(200).send('Error during processing, but acknowledged');
     }
-
-    const completePayment = await Payment.findOneAndUpdate(
-      { _id: ongoingPayment },
-      {
-        $set: {
-          rentee_id: user._id,
-          transection_id: paymentIntentId,
-          status: status
-        }
-      },
-      { new: true }
-    );
-
-    if (!completePayment) {
-      console.error("Payment not found for ID:", ongoingPayment);
-      return;
-    }
-
-    if (status === 'paid') {
-      await Rental.create({
-        itemId: completePayment.item_id,
-        renterId: user._id,
-        ownerId: completePayment.owner_id,
-        startDate: startDate,
-        endDate: endDate,
-        status: status,
-        totalAmount: amount_total
-      });
-    }
-  } catch (err) {
-   res.status(500).json({
-    success:false,
-    message:err.message
-   })
   }
-}
-
 
   res.status(200).json({ received: true });
 };
+
 
 export const createListerAccount=async(req,res)=>{
   const{firstName,lastName,email}=req.body
@@ -293,7 +289,7 @@ try{
   
   
   })
-  await User.updateOne({email},{$set:{acc_no:account.id}})
+  await User.updateOne({email},{$set:{acc_no:account.id,status:"pending"}})
   res.status(200).json({
     success:true,
     account

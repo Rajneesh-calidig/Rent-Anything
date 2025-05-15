@@ -135,7 +135,7 @@ export const Header = () => {
               <img
                 src={Logo || "/placeholder.svg"}
                 alt="Rent Anything"
-                className="h-10 w-auto mr-2"
+                className="h-8 w-auto -ml-8"
               />
             </Link>
           </div>

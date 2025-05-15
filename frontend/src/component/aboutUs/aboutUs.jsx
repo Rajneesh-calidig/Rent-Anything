@@ -1,7 +1,7 @@
 import React from "react";
 import Astitva from "../../assets/company-owner/astitva.png";
-import Yash from "../../assets/company-owner/yash.png";
-import Rajneesh from "../../assets/company-owner/rajneesh.png";
+import Yash from "../../assets/company-owner/yash.jpg";
+import Rajneesh from "../../assets/company-owner/raj.jpg";
 
 export const About = () => {
   return (
@@ -71,17 +71,17 @@ export const About = () => {
           </h3>
           <div className="mt-6 flex flex-wrap justify-center gap-6">
             {[
-              { name: "Astitva Singh Tomar", role: "CEO", img: "Astitva" },
-              { name: "Yash Kumar", role: "CTO", img: "Yash" },
+              { name: "Astitva Singh Tomar", role: "Quality Analyst", img: Astitva },
+              { name: "Yash Kumar", role: "Developer", img: Yash },
               {
                 name: "Rajneesh Dadheech",
-                role: "Marketing Head",
-                img: "Rajneesh",
+                role: "Developer",
+                img: Rajneesh,
               },
             ].map((member, index) => (
               <div key={index} className="text-center">
-                <div className="w-32 h-32 bg-gray-300 rounded-full mx-auto">
-                  {/* <img src={member.img} className="w-32 h-32 bg-gray-300 rounded-full mx-auto"/> */}
+                <div className="w-32 h-32 bg-gray-300 rounded-full mx-auto object-cover">
+                  <img src={member.img} className="w-32 h-32 bg-gray-300 rounded-full mx-auto"/>
                 </div>
                 <h4 className="mt-3 font-semibold text-gray-800">
                   {member.name}

@@ -4,17 +4,17 @@ export const generateTokenAndSetCookie = (userId, res, rememberMe = true) => {
   const expiresIn = rememberMe ? "30d" : "3h";
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn });
 
-  const cookieOptions = {
-    httpOnly: true,
-    sameSite: "none",
-    secure: true,
-    domain: "rent-anything.vercel.app",
-  };
   // const cookieOptions = {
   //   httpOnly: true,
-  //   sameSite: "strict",
-  //   secure: false,
+  //   sameSite: "none",
+  //   secure: true,
+  //   domain: "rent-anything.vercel.app",
   // };
+  const cookieOptions = {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: false,
+  };
 
   if (rememberMe) {
     cookieOptions.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds

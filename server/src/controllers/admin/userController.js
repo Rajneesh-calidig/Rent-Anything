@@ -38,3 +38,20 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const updateNewLister=async(req,res)=>{
+    const {isLister}=req.body
+    const {id}=req.params
+    // console.log(req.params)
+    try{
+const user=await User.findOneAndUpdate({_id:id},{$set:{isLister:isLister}})
+
+res.status(201).json({
+    success:true,
+    message:"user update successfully"
+})
+
+    }catch(err){
+
+    }
+}

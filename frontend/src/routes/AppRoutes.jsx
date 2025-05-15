@@ -12,6 +12,7 @@ import BrowseItems from "../component/items/BrowseItems";
 import BookItem from "../component/items/BookItem";
 import AddItem from "../component/items/AddItem";
 import GoogleOauth from "../pages/google_authenctication/GoogleOauth";
+import SuccessPage from "../component/success/success";
 
 const AppRoutes = () => {
   return (
@@ -24,6 +25,8 @@ const AppRoutes = () => {
       <Route path="/search" element={<BrowseItems />} />
       <Route path="/item/:id" element={<BookItem />} />
       <Route path="/google/callback" element={<GoogleOauth />} />
+      <Route path="/success" element={<SuccessPage />} />
+
       {/* <Route path ="/google/auth/check" element={<} */}
 
       <Route element={<AuthGuard isProtected={false} />}>

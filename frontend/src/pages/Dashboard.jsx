@@ -112,6 +112,13 @@ export default function Dashboard() {
     try {
       // Here you would typically send the data to your backend
       // For now, we'll just update the user's isLister status
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/payment/create-linked-account`,{
+        method:"POST",
+        headers:{
+          "content-type":"application/json"
+        },
+        body:JSON.stringify(stripeFormData)
+      })
       await updateUser({
         ...user,
         isLister: "pending",
@@ -146,51 +153,51 @@ export default function Dashboard() {
     // Check if user wants to add an item but doesn't have a Stripe account
     if (activeSection === "add-item") {
       // First check if KYC is completed or pending
-      if (user.kycStatus === "NOT SUBMITTED") {
-        // KYC not completed, show KYC requirement message
-        return (
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-start mb-4">
-              <AlertCircle className="text-amber-600 mr-3 mt-0.5" />
-              <div>
-                <h2 className="text-xl font-semibold">
-                  KYC Verification Required
-                </h2>
-                <p className="text-gray-600 mt-2">
-                  Before you can become a seller, you need to complete your KYC
-                  (Know Your Customer) verification. This helps us maintain a
-                  secure marketplace for all users.
-                </p>
-              </div>
-            </div>
+      // if (user.kycStatus === "NOT SUBMITTED") {
+      //   // KYC not completed, show KYC requirement message
+      //   return (
+      //     <div className="bg-white rounded-xl shadow-md p-6">
+      //       <div className="flex items-start mb-4">
+      //         <AlertCircle className="text-amber-600 mr-3 mt-0.5" />
+      //         <div>
+      //           <h2 className="text-xl font-semibold">
+      //             KYC Verification Required
+      //           </h2>
+      //           <p className="text-gray-600 mt-2">
+      //             Before you can become a seller, you need to complete your KYC
+      //             (Know Your Customer) verification. This helps us maintain a
+      //             secure marketplace for all users.
+      //           </p>
+      //         </div>
+      //       </div>
 
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h3 className="font-medium text-gray-800 mb-2">
-                How to complete KYC verification:
-              </h3>
-              <ol className="list-decimal list-inside text-gray-600 space-y-1 ml-2">
-                <li>Go to your profile section</li>
-                <li>Click on "Verify Identity"</li>
-                <li>Upload the required documents (ID proof, address proof)</li>
-                <li>Submit for verification</li>
-              </ol>
-            </div>
+      //       <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+      //         <h3 className="font-medium text-gray-800 mb-2">
+      //           How to complete KYC verification:
+      //         </h3>
+      //         <ol className="list-decimal list-inside text-gray-600 space-y-1 ml-2">
+      //           <li>Go to your profile section</li>
+      //           <li>Click on "Verify Identity"</li>
+      //           <li>Upload the required documents (ID proof, address proof)</li>
+      //           <li>Submit for verification</li>
+      //         </ol>
+      //       </div>
 
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                onClick={() => {
-                  setActiveSection("profile");
-                  setActiveSidebarItem("profile");
-                  sessionStorage.setItem("activeSidebarItem", "profile");
-                }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Go to Profile
-              </button>
-            </div>
-          </div>
-        );
-      }
+      //       <div className="mt-6 flex justify-end space-x-3">
+      //         <button
+      //           onClick={() => {
+      //             setActiveSection("profile");
+      //             setActiveSidebarItem("profile");
+      //             sessionStorage.setItem("activeSidebarItem", "profile");
+      //           }}
+      //           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+      //         >
+      //           Go to Profile
+      //         </button>
+      //       </div>
+      //     </div>
+      //   );
+      // }
 
       // KYC is verified or pending, now check isLister status
       if (user.isLister === "false") {
